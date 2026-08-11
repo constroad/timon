@@ -1,0 +1,28 @@
+# Registrar una vuelta SIN SEÑAL (Timón · A4).
+#
+# El caso normal de la carretera, no un caso raro. Lo que se prueba es que el
+# tap no se pierde y que la pantalla lo DICE: un tap guardado con la pantalla
+# muda se lee igual que un tap perdido, y el chofer vuelve a tocar.
+#
+# La red se corta desde afuera con `adb shell svc data disable` / `svc wifi
+# disable` — la cola no se puede probar con un mock de red.
+#
+# **NO hay `launchApp` a propósito.** El build de desarrollo trae el JS desde
+# Metro por la red: si se corta la red y DESPUÉS se abre la app, no arranca por
+# un motivo que no tiene nada que ver con lo que se está probando. El orden es
+# al revés — la app ya cargada, y ahí se corta. El chofer vive exactamente ese
+# caso: la app abierta y la señal que se cae en la carretera.
+appId: com.constroad.timon
+---
+- assertVisible: "Hola, Pedro Ramirez"
+
+- tapOn:
+    id: "abrir-vueltas"
+- assertVisible: "Registrar vuelta"
+- tapOn:
+    id: "vuelta-registrar"
+
+# No dice «Vuelta registrada»: eso sería mentira, todavía no llegó al server.
+- assertVisible: "Sin señal. Se enviará solo cuando vuelva."
+- assertVisible:
+    id: "cola-pendiente"

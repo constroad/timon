@@ -1,0 +1,90 @@
+# Checklist en orden: el viaje arranca (Timón · A3).
+#
+# Continúa donde termina `alta.yaml`: el equipo ya está dado de alta, así que
+# NO se limpia el estado — se aprovecha la credencial guardada, que es como lo
+# vive el chofer todos los días.
+#
+# Sembrar antes desde Portal:
+#   npx tsx --env-file=.env scripts/qa-timon-e2e.ts
+appId: com.constroad.timon
+---
+# A5: el viaje no arranca sin un fix real. `adb emu geo fix` no alimenta al
+# servicio de ubicación de este AVD; `setLocation` de Maestro sí.
+- setLocation:
+    latitude: -12.0464
+    longitude: -77.0428
+- launchApp
+
+- assertVisible: "Hola, Pedro Ramirez"
+- assertVisible: "TU PRÓXIMO VIAJE"
+
+# El botón dice lo que el SERVER permite ahora, no un texto fijo del cliente.
+- tapOn:
+    id: "accion-viaje"
+
+# Iniciar pasa siempre por el checklist: es la evidencia de que alguien miró la
+# unidad antes de salir.
+- assertVisible: "Antes de salir"
+
+# Se responde en el ORDEN del catálogo y con `scrollUntilVisible`: la lista no
+# entra en una pantalla y Maestro no hace scroll solo — tocar por id un ítem
+# fuera de vista falla sin decir que el problema era el scroll.
+- scrollUntilVisible:
+    element:
+      id: "check-bien-frenos"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-frenos"
+
+- tapOn:
+    id: "check-bien-luces"
+
+- scrollUntilVisible:
+    element:
+      id: "check-bien-llantas"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-llantas"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-fugas"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-fugas"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-espejos"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-espejos"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-docs"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-docs"
+
+- tapOn:
+    id: "checklist-confirmar"
+
+# A5: al confirmar, la app pide la posición y Android muestra su diálogo de
+# permiso. Es el PRIMER momento en que se pide — antes de un viaje no se toca el
+# GPS, que es la invariante #3. Aceptarlo es parte del flujo del chofer.
+- runFlow:
+    when:
+      visible: "While using the app"
+    commands:
+      - tapOn: "While using the app"
+
+# Todo en orden: el viaje ARRANCA. Lo dice el server al recargar, no el cliente.
+- assertVisible: "En curso"

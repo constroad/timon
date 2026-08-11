@@ -1,0 +1,23 @@
+# Registro de asistencia desde la app (Timón · A6).
+#
+# Lo que se prueba es la regla que costó dos días de fichaje perdido: **nada
+# impide registrar que se trabajó**. El botón dice lo que el SERVER permite —
+# entrada primero, salida después—, no un texto fijo del cliente.
+#
+# Sembrar sin flags. NO hay `launchApp`: la app viene del flujo de alta.
+appId: com.constroad.timon
+---
+- assertVisible: "Hola, Pedro Ramirez"
+
+- tapOn:
+    id: "tab-asistencia"
+- assertVisible: "Tu asistencia de hoy"
+
+# Sin marcas todavía: el server dice que toca entrar.
+- assertVisible: "Marcar entrada"
+- tapOn:
+    id: "asistencia-marcar"
+- assertVisible: "Entrada registrada"
+
+# Y ahora el MISMO botón ofrece lo siguiente, porque el estado lo manda el server.
+- assertVisible: "Marcar salida"

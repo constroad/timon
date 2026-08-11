@@ -1,0 +1,20 @@
+# La compuerta de versión mínima (Timón · A7 §6-1).
+#
+# Un APK fuera de la tienda no se actualiza solo: con 30 choferes, en tres meses
+# hay cinco versiones en la calle. Lo que se prueba es que el bloqueo aparezca
+# ANTES de todo —incluso antes del alta— y que NO se pueda saltear.
+#
+# El server se prepara desde afuera, subiendo la mínima por encima de la
+# instalada:
+#   npx tsx --env-file=.env scripts/set-timon-min-version.ts 99.0.0
+appId: com.constroad.timon
+---
+- launchApp
+
+- assertVisible: "Actualiza Timón"
+- assertVisible:
+    text: ".*versión 99.0.0 o mayor.*"
+
+# Lo que NO tiene que haber: ninguna forma de entrar igual.
+- assertNotVisible: "¿De qué empresa eres?"
+- assertNotVisible: "Hola, Pedro Ramirez"

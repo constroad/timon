@@ -1,0 +1,56 @@
+# Firmar la entrega y cerrar el viaje (Timón · A3), sobre el emulador.
+#
+# Arranca con el viaje YA en curso: este flujo prueba la constancia, no el
+# inicio. Sembrar antes desde Portal y correr `iniciar-viaje-ok.yaml`, o sembrar
+# el viaje directamente en curso.
+appId: com.constroad.timon
+---
+- launchApp
+
+- assertVisible: "Hola, Pedro Ramirez"
+- assertVisible: "TU VIAJE AHORA"
+- tapOn:
+    id: "accion-viaje"
+
+# Entregar SIEMPRE pasa por la firma: cerrar un viaje sin constancia dejaría la
+# entrega sin prueba, que es de lo que cuelga la facturación.
+- assertVisible: "Firma de quien recibe"
+
+- tapOn:
+    id: "pod-nombre"
+- inputText: "Luis Camacho"
+# Cerrar el teclado ANTES de firmar: si queda abierto tapa el área de firma y
+# los trazos caen sobre las teclas. Y de paso evita que el autocorrector agregue
+# una sugerencia al nombre («Luis Camacho to»).
+- pressKey: Enter
+
+# El DNI es opcional a propósito: en obra recibe a veces un ayudante sin
+# documento a mano. Se deja vacío para probar justo ese camino.
+
+# Tres trazos sobre el área de firma. Un solo toque NO alcanza: la app exige un
+# trazo de verdad, para que un roce no cierre la entrega sin querer.
+# Trazos LENTOS: el motor exige 8 puntos para distinguir una firma de un roce,
+# y un swipe rápido entrega dos o tres. La duración es lo que los genera.
+- swipe:
+    start: "25%, 55%"
+    end: "75%, 65%"
+    duration: 1200
+- swipe:
+    start: "70%, 60%"
+    end: "30%, 70%"
+    duration: 1200
+- swipe:
+    start: "35%, 68%"
+    end: "65%, 56%"
+    duration: 1200
+
+- tapOn:
+    id: "pod-guardar"
+
+# La app confirma la entrega con el nombre de quien recibió. Sin esto el chofer
+# firma y la pantalla se le queda en blanco: el viaje deja de ser el protagonista
+# y cae a la lista colapsada, sin decirle que salió bien.
+- assertVisible: "Entregado a Luis Camacho"
+
+# Y el viaje quedó cerrado: lo dice el server al recargar, no el cliente.
+- assertVisible: "Entregado"

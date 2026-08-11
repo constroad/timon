@@ -1,0 +1,56 @@
+# Alta del conductor, sobre el emulador (Timón · E2E).
+#
+# Corre la app REAL contra el Portal REAL: cada paso cruza pantalla → HTTP →
+# API → Mongo. Es la capa que el arnés de RNTL no cubre — render nativo,
+# teclado, gestos.
+#
+# Antes de correrlo, sembrar el tenant desde Portal:
+#   npx tsx --env-file=.env scripts/qa-timon-e2e.ts
+# y al terminar, limpiarlo con --limpiar.
+appId: com.constroad.timon
+---
+# `clearState` es lo que hace el flujo repetible: sin eso la segunda corrida
+# arranca con la credencial de la primera y nunca ve el alta.
+- launchApp:
+    clearState: true
+
+# `testID` es lo que Maestro lee como `id` en Android; `accessibilityLabel` cae
+# en content-desc y sirve al lector de pantalla. Hacen falta los dos.
+- assertVisible: "¿De qué empresa eres?"
+- tapOn:
+    id: "input-codigo-empresa"
+- inputText: "X7G2-DP4E-Z8"
+# El teclado tapa «Continuar» en un emulador recién booteado: el tap caería
+# sobre una tecla. Se cierra con Enter (no con `hideKeyboard`, que en Android
+# manda ATRÁS y puede cerrar la pantalla).
+- pressKey: Enter
+- tapOn: "Continuar"
+
+- assertVisible: "¿Es tu empresa?"
+- assertVisible: "TEST COMPANY"
+- tapOn: "Sí, continuar"
+
+- assertVisible: "¿Cuál es tu número?"
+- tapOn:
+    id: "input-telefono"
+- inputText: "987654321"
+- pressKey: Enter
+- tapOn: "Continuar"
+
+# El «Continuar» de arriba pidió un código REAL al servidor, aleatorio. Acá se
+# re-sella con uno conocido: sembrarlo antes no sirve, porque ese pedido lo
+# habría superado y el flujo se invalidaría a sí mismo.
+- runScript: sellarOtp.js
+
+- assertVisible: "Escribe el código"
+- tapOn:
+    id: "input-otp"
+- inputText: "123456"
+- pressKey: Enter
+- tapOn: "Continuar"
+
+# El saludo sale de la FICHA del chofer en la base, no de nada que el flujo haya
+# escrito: si aparece, el alta cruzó toda la pila.
+- assertVisible: "Hola, Pedro Ramirez"
+# El kicker cambia según el estado del viaje; la ruta no.
+- assertVisible: "Lima → Ica"

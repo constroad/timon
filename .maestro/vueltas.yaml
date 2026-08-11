@@ -1,0 +1,21 @@
+# Registrar una vuelta de la jornada (Timón · A3).
+#
+# En un viaje por ciclos el chofer no «avanza el viaje»: da vueltas, y cada una
+# es plata en la liquidación. Sembrar con `--ciclos`.
+appId: com.constroad.timon
+---
+- launchApp
+- assertVisible: "Hola, Pedro Ramirez"
+
+- tapOn:
+    id: "abrir-vueltas"
+
+# El m³ viene pre-llenado con la tolva de la unidad: en la mayoría de las
+# vueltas el chofer no teclea nada.
+- assertVisible: "Registrar vuelta"
+- tapOn:
+    id: "vuelta-registrar"
+
+# La cuenta la devuelve el SERVER al recargar: si subiera sola en el cliente,
+# una vuelta perdida en la red se vería como registrada.
+- assertVisible: "Vuelta registrada"

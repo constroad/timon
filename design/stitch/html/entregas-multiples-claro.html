@@ -1,0 +1,104 @@
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;font-family:'Inter',sans-serif;}body{overscroll-behavior:none;background-color:#fcf9f8;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed-dim":"#4edea3","on-error-container":"#93000a","background":"#fcf9f8","inverse-surface":"#313030","primary-fixed":"#dbe1ff","surface-container-lowest":"#ffffff","on-surface":"#1c1b1b","surface-dim":"#dcd9d9","on-primary-fixed-variant":"#003ea8","on-tertiary-container":"#ffeedd","on-background":"#1c1b1b","surface":"#fcf9f8","surface-container-high":"#eae7e7","inverse-on-surface":"#f3f0ef","on-secondary-fixed-variant":"#005236","primary":"#004ac6","primary-container":"#2563eb","surface-container":"#f0eded","surface-container-highest":"#e5e2e1","surface-bright":"#fcf9f8","on-surface-variant":"#434655","on-secondary-fixed":"#002113","tertiary":"#784b00","tertiary-fixed-dim":"#ffb95f","secondary-fixed":"#6ffbbe","on-error":"#ffffff","on-tertiary":"#ffffff","primary-fixed-dim":"#b4c5ff","error":"#ba1a1a","error-container":"#ffdad6","on-primary-container":"#eeefff","on-secondary":"#ffffff","on-tertiary-fixed":"#2a1700","tertiary-fixed":"#ffddb8","surface-variant":"#e5e2e1","surface-container-low":"#f6f3f2","inverse-primary":"#b4c5ff","secondary-container":"#6cf8bb","secondary":"#006c49","tertiary-container":"#996100","outline-variant":"#c3c6d7","on-secondary-container":"#00714d","on-primary-fixed":"#00174b","on-primary":"#ffffff","on-tertiary-fixed-variant":"#653e00","surface-tint":"#0053db","outline":"#737686"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"padding-card":"16px","touch-target-min":"56px","gutter-stack":"12px","margin-screen":"16px","touch-target-primary":"64px"},"fontFamily":{"label-caps":["Inter"],"body-lg":["Inter"],"body-md":["Inter"],"button-text":["Inter"],"headline-md":["Inter"],"display-data":["Inter"]},"fontSize":{"label-caps":["14px",{"lineHeight":"20px","letterSpacing":"0.05em","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"26px","fontWeight":"400"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"button-text":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"display-data":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background min-h-screen flex flex-col"><header class="fixed top-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-screen flex items-center justify-between"><h1 class="font-headline-md text-headline-md text-on-surface">Mis Viajes</h1><div class="flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-grow relative w-full pt-16 pb-24 bg-background"><div class="flex flex-col w-full relative">
+<!-- Progress Bar Section -->
+<div class="px-margin-screen py-4 bg-surface sticky top-0 z-10 border-b border-surface-container-high shadow-sm">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Progreso de ruta</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">1 de 3 firmadas</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary transition-all duration-500 ease-out" style="width: 33%;"></div>
+</div>
+</div>
+<!-- Timeline Container -->
+<div class="px-margin-screen py-6 flex flex-col gap-0 relative">
+<!-- Timeline vertical line (background) -->
+<div class="absolute left-[39px] top-[48px] bottom-[120px] w-0.5 bg-surface-container-highest z-0"></div>
+<!-- Stop 1: Completed -->
+<div class="relative z-10 flex gap-4 min-h-[120px]">
+<!-- Timeline Node -->
+<div class="flex flex-col items-center pt-1">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center border-2 border-surface z-10">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Content Card -->
+<div class="flex-1 pb-8">
+<div class="bg-surface-container-lowest rounded-xl p-padding-card shadow-sm border border-surface-container-high relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-secondary-fixed/20 to-transparent pointer-events-none rounded-tr-xl"></div>
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Entregado</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">08:45 AM</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Almacén Central Chincha</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-3">Av. Principal 123, Zona Industrial</p>
+<div class="flex items-center gap-2 mt-2 pt-3 border-t border-surface-container-high">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
+<span class="font-body-md text-body-md text-on-surface">Firmado por: <strong>Ricardo Paz</strong></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Stop 2: Pending (Active) -->
+<div class="relative z-10 flex gap-4 min-h-[180px]">
+<!-- Timeline Node -->
+<div class="flex flex-col items-center pt-1">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-2 border-surface z-10 shadow-[0_0_0_4px_rgba(37,99,235,0.2)]">
+<span class="font-label-caps text-label-caps text-on-primary">2</span>
+</div>
+</div>
+<!-- Content Card -->
+<div class="flex-1 pb-8">
+<div class="bg-surface-container-lowest rounded-xl p-padding-card shadow-md border-l-4 border-l-primary border-y border-r border-surface-container-high relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary-fixed/30 to-transparent pointer-events-none rounded-tr-xl"></div>
+<div class="flex justify-between items-start mb-2">
+<span class="inline-flex items-center gap-1 font-label-caps text-label-caps text-primary bg-primary-fixed/50 px-2 py-1 rounded-md">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Siguiente Parada
+                         </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Distribuidora Ica</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Panamericana Sur Km 300</p>
+<!-- Action Map/Directions -->
+<a class="flex items-center gap-2 text-primary font-button-text text-button-text mb-4 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[20px]">directions</span>
+                        Cómo llegar
+                    </a>
+<!-- Primary Action Button -->
+<button class="w-full h-touch-target-primary bg-primary text-on-primary font-button-text text-button-text rounded-lg shadow-md active:bg-primary-container transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_document</span>
+                        Firmar esta entrega
+                    </button>
+</div>
+</div>
+</div>
+<!-- Stop 3: Pending -->
+<div class="relative z-10 flex gap-4 min-h-[120px]">
+<!-- Timeline Node -->
+<div class="flex flex-col items-center pt-1">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border-2 border-surface z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant">3</span>
+</div>
+</div>
+<!-- Content Card -->
+<div class="flex-1">
+<div class="bg-surface-container-lowest rounded-xl p-padding-card shadow-sm border border-surface-container-high opacity-80">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Pendiente</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 text-on-surface-variant">Sucursal Sur Pisco</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-3">Av. Las Américas S/N</p>
+<!-- Final Stop Notice -->
+<div class="bg-tertiary-fixed/30 rounded-lg p-3 flex gap-3 items-start mt-2 border border-tertiary-fixed-dim/30">
+<span class="material-symbols-outlined text-tertiary-container mt-0.5">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-[14px] leading-tight">Al firmar esta, el viaje queda <strong>completamente entregado</strong>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/80 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary"><div class="flex justify-around items-center h-20"><a aria-current="page" class="flex flex-col items-center justify-center gap-1 min-w-[100px] h-touch-target-min transition-colors text-primary" data-path="mis-viajes" href="#"><span class="material-symbols-outlined">local_shipping</span><span class="font-label-caps text-label-caps">Mis Viajes</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[100px] h-touch-target-min text-on-surface-variant transition-colors" data-path="asistencia" href="#"><span class="material-symbols-outlined">support_agent</span><span class="font-label-caps text-label-caps">Asistencia</span></a></div></nav></body></html>

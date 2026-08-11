@@ -1,0 +1,21 @@
+# La compuerta corre con la app YA ABIERTA (Timón · S6).
+#
+# A7 la dejó corriendo solo al abrir, y no alcanza: el chofer no cierra Timón en
+# todo el turno. Si el contrato de API cambia a media mañana, sigue registrando
+# vueltas y entregas que ya no llegan a ningún lado.
+#
+# El server se prepara DESPUÉS de que la app ya está adentro:
+#   npx tsx --env-file=.env scripts/set-timon-min-version.ts 99.0.0
+#
+# NO hay `launchApp`: la gracia es justamente que la app no se reinicia.
+appId: com.constroad.timon
+---
+- assertVisible: "Hola, Pedro Ramirez"
+
+# Al segundo plano y de vuelta: es lo que hace un chofer cada vez que atiende
+# el teléfono, y es cuando la compuerta vuelve a preguntar.
+- pressKey: Home
+- launchApp
+
+- assertVisible: "Actualiza Timón"
+- assertNotVisible: "Hola, Pedro Ramirez"

@@ -1,0 +1,150 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;font-family:'Inter',sans-serif;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}.min-h-touch{min-height:56px;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-tertiary-fixed":"#2a1700","surface-container":"#f0eded","on-primary-container":"#eeefff","on-primary-fixed":"#00174b","on-primary-fixed-variant":"#003ea8","inverse-surface":"#313030","on-error-container":"#93000a","on-secondary-container":"#00714d","secondary-fixed":"#6ffbbe","primary":"#004ac6","on-tertiary-fixed-variant":"#653e00","on-surface":"#1c1b1b","on-tertiary-container":"#ffeedd","surface-container-lowest":"#ffffff","primary-fixed":"#dbe1ff","on-surface-variant":"#434655","tertiary-fixed":"#ffddb8","surface-container-highest":"#e5e2e1","surface":"#fcf9f8","error-container":"#ffdad6","secondary-container":"#6cf8bb","on-tertiary":"#ffffff","tertiary":"#784b00","primary-fixed-dim":"#b4c5ff","tertiary-fixed-dim":"#ffb95f","secondary":"#006c49","on-secondary-fixed-variant":"#005236","secondary-fixed-dim":"#4edea3","outline-variant":"#c3c6d7","surface-container-low":"#f6f3f2","surface-variant":"#e5e2e1","background":"#fcf9f8","surface-bright":"#fcf9f8","surface-container-high":"#eae7e7","inverse-on-surface":"#f3f0ef","on-background":"#1c1b1b","error":"#ba1a1a","outline":"#737686","on-secondary":"#ffffff","primary-container":"#2563eb","surface-tint":"#0053db","inverse-primary":"#b4c5ff","on-secondary-fixed":"#002113","on-error":"#ffffff","tertiary-container":"#996100","on-primary":"#ffffff","surface-dim":"#dcd9d9"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-screen":"16px","touch-target-primary":"64px","touch-target-min":"56px","gutter-stack":"12px","padding-card":"16px"},"fontFamily":{"button-text":["Inter"],"body-md":["Inter"],"headline-md":["Inter"],"display-data":["Inter"],"body-lg":["Inter"],"label-caps":["Inter"]},"fontSize":{"button-text":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"display-data":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-lg":["18px",{"lineHeight":"26px","fontWeight":"400"}],"label-caps":["14px",{"lineHeight":"20px","letterSpacing":"0.05em","fontWeight":"600"}]}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-screen flex items-center justify-between"><span class="font-headline-md text-headline-md text-on-surface">Mis Viajes</span><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="px-margin-screen pb-3"><div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-high"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Viaje en curso: Ruta Norte</span></div></div></header><main class="flex-1 pt-[112px] pb-[100px] bg-background"><div class="flex flex-col w-full h-full relative" id="incident-report-container">
+<div class="px-margin-screen mb-6">
+<h1 class="font-display-data text-display-data text-on-surface mb-2">¿Qué pasó?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Selecciona el tipo de incidente para enviar un reporte inmediato a la central.</p>
+</div>
+<!-- Incident Types Grid -->
+<div class="px-margin-screen grid grid-cols-2 gap-gutter-stack mb-8" id="incident-grid">
+<button class="incident-card bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center min-h-touch transition-colors text-center relative overflow-hidden" data-type="choque">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">car_crash</span>
+<span class="font-label-caps text-label-caps text-on-surface">Choque</span>
+<div class="selection-ring absolute inset-0 border-2 border-transparent rounded-xl pointer-events-none transition-colors"></div>
+</button>
+<button class="incident-card bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center min-h-touch transition-colors text-center relative overflow-hidden" data-type="falla">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">build</span>
+<span class="font-label-caps text-label-caps text-on-surface">Falla mecánica</span>
+<div class="selection-ring absolute inset-0 border-2 border-transparent rounded-xl pointer-events-none transition-colors"></div>
+</button>
+<button class="incident-card bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center min-h-touch transition-colors text-center relative overflow-hidden" data-type="neumatico">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">tire_repair</span>
+<span class="font-label-caps text-label-caps text-on-surface">Neumático</span>
+<div class="selection-ring absolute inset-0 border-2 border-transparent rounded-xl pointer-events-none transition-colors"></div>
+</button>
+<button class="incident-card bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center min-h-touch transition-colors text-center relative overflow-hidden" data-type="robo">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">warning</span>
+<span class="font-label-caps text-label-caps text-on-surface">Robo</span>
+<div class="selection-ring absolute inset-0 border-2 border-transparent rounded-xl pointer-events-none transition-colors"></div>
+</button>
+<button class="incident-card bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center min-h-touch transition-colors text-center relative overflow-hidden" data-type="bloqueo">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">block</span>
+<span class="font-label-caps text-label-caps text-on-surface">Bloqueo de vía</span>
+<div class="selection-ring absolute inset-0 border-2 border-transparent rounded-xl pointer-events-none transition-colors"></div>
+</button>
+<button class="incident-card bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center min-h-touch transition-colors text-center relative overflow-hidden" data-type="otro">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">more_horiz</span>
+<span class="font-label-caps text-label-caps text-on-surface">Otro</span>
+<div class="selection-ring absolute inset-0 border-2 border-transparent rounded-xl pointer-events-none transition-colors"></div>
+</button>
+</div>
+<!-- Details Section (Hidden by default) -->
+<div class="px-margin-screen hidden flex-col gap-gutter-stack pb-24 transition-opacity duration-300 opacity-0" id="details-section">
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface" for="incident-description">Detalles adicionales</label>
+<textarea class="w-full bg-surface-container text-on-surface font-body-md text-body-md rounded-xl p-4 min-h-touch focus:outline-none focus:ring-2 focus:ring-primary placeholder-on-surface-variant" id="incident-description" placeholder="Describe brevemente la situación..." rows="3"></textarea>
+</div>
+<div class="flex flex-col gap-2 mt-2">
+<span class="font-label-caps text-label-caps text-on-surface">Evidencia gráfica</span>
+<button class="w-full h-touch-target-primary border border-outline-variant border-dashed rounded-xl flex items-center justify-center gap-2 text-on-surface-variant bg-surface-container-low hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">add_a_photo</span>
+<span class="font-button-text text-button-text">Añadir fotos (Max 3)</span>
+</button>
+<div class="flex gap-2 mt-2 hidden" id="photo-preview-container">
+<!-- Example photo placeholders -->
+<div class="w-16 h-16 rounded-lg bg-surface-container-high relative overflow-hidden" data-alt="Close up of a generic damaged truck bumper on a paved road, daylight. Minimalistic style, muted colors fitting a rugged trucking UI theme." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBr6TQS2nHNCD2dDo3AGNRnp2AvGXgD7KfXkCY2O4s-sG_EdwmS3pvXrIlbSB-WfUAGnDOhySI8YomLudjJ42iIudJK__MgDTCLnckEHVuza-ZUR_WGlyAWCEfEq4P0NcUrIoII9QVJgrSf7Nl60Y3b499TzNq2gri1_lpeNsvgGZxIJERfqo597L4RWmFBf2W__FdG72HjVk6DSchf7zeN2jVXlfJGuQs9BDdpdwjK3BBEeQO-R1Qp')">
+<button class="absolute top-1 right-1 w-5 h-5 bg-inverse-surface/80 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-inverse-surface text-[12px]">close</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Fixed Bottom Action -->
+<div class="fixed bottom-[100px] left-0 right-0 px-margin-screen pb-4 bg-gradient-to-t from-background via-background to-transparent pt-8 pointer-events-none">
+<button class="w-full h-touch-target-primary rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 transition-all duration-300 bg-surface-container-high text-on-surface-variant pointer-events-auto shadow-md relative overflow-hidden" disabled="" id="submit-report">
+<div class="absolute inset-0 bg-primary opacity-0 transition-opacity duration-300" id="submit-bg"></div>
+<span class="material-symbols-outlined relative z-10" id="submit-icon">send</span>
+<span class="relative z-10" id="submit-text">Selecciona un incidente</span>
+</button>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.incident-card');
+        const detailsSection = document.getElementById('details-section');
+        const submitBtn = document.getElementById('submit-report');
+        const submitBg = document.getElementById('submit-bg');
+        const submitIcon = document.getElementById('submit-icon');
+        const submitText = document.getElementById('submit-text');
+        const textarea = document.getElementById('incident-description');
+        
+        let selectedType = null;
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Reset all cards
+                cards.forEach(c => {
+                    c.classList.remove('bg-error-container', 'text-on-error-container');
+                    c.classList.add('bg-surface-container');
+                    c.querySelector('.material-symbols-outlined').classList.replace('text-error', 'text-on-surface-variant');
+                    c.querySelector('.selection-ring').classList.replace('border-error', 'border-transparent');
+                });
+
+                // Set active state
+                card.classList.remove('bg-surface-container');
+                card.classList.add('bg-error-container', 'text-on-error-container');
+                card.querySelector('.material-symbols-outlined').classList.replace('text-on-surface-variant', 'text-error');
+                card.querySelector('.selection-ring').classList.replace('border-transparent', 'border-error');
+                
+                selectedType = card.dataset.type;
+
+                // Show details
+                detailsSection.classList.remove('hidden');
+                // Small delay to allow display block to apply before opacity transition
+                setTimeout(() => {
+                    detailsSection.classList.remove('opacity-0');
+                    detailsSection.classList.add('opacity-100');
+                }, 10);
+
+                // Update Submit Button State
+                updateSubmitState();
+                
+                // Smooth scroll down a bit
+                setTimeout(() => {
+                   window.scrollTo({
+                        top: document.body.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            });
+        });
+
+        textarea.addEventListener('input', updateSubmitState);
+
+        function updateSubmitState() {
+             if (selectedType) {
+                 submitBtn.removeAttribute('disabled');
+                 submitBtn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+                 submitBtn.classList.add('text-on-primary');
+                 submitBg.classList.replace('opacity-0', 'opacity-100');
+                 submitText.textContent = 'Enviar reporte de ' + selectedType;
+                 
+                 // Make it look urgent
+                 submitBg.classList.add('bg-error');
+                 submitBg.classList.remove('bg-primary');
+                 
+             } else {
+                 submitBtn.setAttribute('disabled', 'true');
+                 submitBtn.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+                 submitBtn.classList.remove('text-on-primary');
+                 submitBg.classList.replace('opacity-100', 'opacity-0');
+                 submitText.textContent = 'Selecciona un incidente';
+             }
+        }
+    });
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-20 px-4"><a aria-current="page" class="flex flex-col items-center justify-center gap-1 w-1/2 h-full transition-colors text-primary font-semibold" data-path="mis-viajes" href="#"><span class="material-symbols-outlined">local_shipping</span><span class="font-label-caps text-label-caps">Mis viajes</span></a><a class="flex flex-col items-center justify-center gap-1 w-1/2 h-full text-on-surface-variant transition-colors" data-path="asistencia" href="#"><span class="material-symbols-outlined">support_agent</span><span class="font-label-caps text-label-caps">Asistencia</span></a></div></nav></body></html>

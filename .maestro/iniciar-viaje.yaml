@@ -1,0 +1,88 @@
+# Checklist con un hallazgo CRÍTICO: la unidad no sale (Timón · A3).
+#
+# Continúa donde termina `alta.yaml`: el equipo ya está dado de alta, así que
+# NO se limpia el estado — se aprovecha la credencial guardada, que es como lo
+# vive el chofer todos los días.
+#
+# Sembrar antes desde Portal:
+#   npx tsx --env-file=.env scripts/qa-timon-e2e.ts
+appId: com.constroad.timon
+---
+- launchApp
+
+- assertVisible: "Hola, Pedro Ramirez"
+- assertVisible: "TU PRÓXIMO VIAJE"
+
+# El botón dice lo que el SERVER permite ahora, no un texto fijo del cliente.
+- tapOn:
+    id: "accion-viaje"
+
+# Iniciar pasa siempre por el checklist: es la evidencia de que alguien miró la
+# unidad antes de salir.
+- assertVisible: "Antes de salir"
+
+# Se responde en el ORDEN del catálogo y con `scrollUntilVisible`: la lista no
+# entra en una pantalla y Maestro no hace scroll solo — tocar por id un ítem
+# fuera de vista falla sin decir que el problema era el scroll.
+- scrollUntilVisible:
+    element:
+      id: "check-bien-frenos"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-frenos"
+
+# Un punto en mal estado abre su nota y se declara igual: el checklist registra
+# lo que hay, no lo que conviene.
+- tapOn:
+    id: "check-mal-luces"
+- tapOn:
+    id: "check-nota-luces"
+- inputText: "Faro derecho quemado"
+# Sin `hideKeyboard`: en Android manda la tecla atrás, y el checklist la recibe.
+# El scroll siguiente ya aparta el teclado solo.
+
+- scrollUntilVisible:
+    element:
+      id: "check-bien-llantas"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-llantas"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-fugas"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-fugas"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-espejos"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-espejos"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-docs"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-docs"
+
+- tapOn:
+    id: "checklist-confirmar"
+
+# `luces` es un punto CRÍTICO del catálogo de la empresa: declararlo en mal
+# estado BLOQUEA la salida. Lo decide el server, y su mensaje llega intacto a la
+# pantalla — que es lo único que le sirve al chofer para saber qué hacer.
+- assertVisible: "Hallazgo crítico: la unidad no puede salir. Se avisó al taller."
+
+# Y el viaje NO arrancó: sigue programado.
+- assertVisible: "Programado"

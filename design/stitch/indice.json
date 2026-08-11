@@ -1,0 +1,158 @@
+[
+  {
+    "titulo": "Permiso de batería (Claro)",
+    "archivo": "permiso-de-bateria-claro",
+    "id": "b6cfa26bb5af430097896a68b3f8fd01",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Vueltas Registradas (Claro)",
+    "archivo": "vueltas-registradas-claro",
+    "id": "3fc072e7ac134d9683344a71ec8f3891",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Bienvenida (Claro)",
+    "archivo": "bienvenida-claro",
+    "id": "543ea9d8452e4984a8749e2375256df0",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Viaje en curso (Claro)",
+    "archivo": "viaje-en-curso-claro",
+    "id": "cc0cadedc52a4cb29d90465601750a10",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Mis viajes (Oscuro)",
+    "archivo": "mis-viajes-oscuro",
+    "id": "f521becf138c416dbe0c9878048cf091",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Checklist de seguridad (Oscuro)",
+    "archivo": "checklist-de-seguridad-oscuro",
+    "id": "1b4d30fbdae34b5f937e9d15f58d72c2",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Registro de Asistencia (Claro)",
+    "archivo": "registro-de-asistencia-claro",
+    "id": "bc0359abda7147cd9d55b56950749016",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Código de empresa (Claro)",
+    "archivo": "codigo-de-empresa-claro",
+    "id": "35749a75c35e4d15a4b9930998cc4fa1",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Entregas múltiples (Claro)",
+    "archivo": "entregas-multiples-claro",
+    "id": "daf4ed0c06e3435680fb7e7cd70d73dd",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Asistencia fuera de zona (Oscuro)",
+    "archivo": "asistencia-fuera-de-zona-oscuro",
+    "id": "19dea2abb3d0459e98a3ce551fd3fd7e",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Perfil del Conductor (Claro)",
+    "archivo": "perfil-del-conductor-claro",
+    "id": "70174536dc234f3b83da4a5a58c7214f",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Firmar entrega (Claro)",
+    "archivo": "firmar-entrega-claro",
+    "id": "913ecd3044824fad92c5706fa7702592",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Código de Verificación (Claro)",
+    "archivo": "codigo-de-verificacion-claro",
+    "id": "45d90d75b4a54c51949e8c521ebefaef",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Reportar Incidente (Claro)",
+    "archivo": "reportar-incidente-claro",
+    "id": "1a5a2d1bd5894ea08d9c5c79927eabf9",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Detalle del Viaje (Claro)",
+    "archivo": "detalle-del-viaje-claro",
+    "id": "31867fb770f8464a9ea22c61dcccd79c",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Ruta Pro Driver Management App",
+    "archivo": "ruta-pro-driver-management-app",
+    "id": "cba4aec7623840e3b9cfbac172689eba",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Firmar entrega (Oscuro)",
+    "archivo": "firmar-entrega-oscuro",
+    "id": "d7d8cc32c22045fb958757062be51d18",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Bienvenida (Oscuro)",
+    "archivo": "bienvenida-oscuro",
+    "id": "e73c773a8e6f4718a14a61514ddb920f",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Documentos del Viaje (Claro)",
+    "archivo": "documentos-del-viaje-claro",
+    "id": "2b1201ed538a449d9b78b3caae639b28",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Confirmar Empresa (Claro)",
+    "archivo": "confirmar-empresa-claro",
+    "id": "2ffef2e230a344cb8a5b37de891975a1",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Entregas múltiples (Oscuro)",
+    "archivo": "entregas-multiples-oscuro",
+    "id": "4abb16070572473dab3749ced6dd2e1d",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Checklist de seguridad (Claro)",
+    "archivo": "checklist-de-seguridad-claro",
+    "id": "7f4d1ad92951426ab7abc2e1215f6818",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Mi número (Claro)",
+    "archivo": "mi-numero-claro",
+    "id": "271f38d48b604c79a8d3048a66a58ba1",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Permiso de ubicación (Claro)",
+    "archivo": "permiso-de-ubicacion-claro",
+    "id": "8b8e41f934894479ab31cf55b918753a",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Detalle del Viaje (Oscuro)",
+    "archivo": "detalle-del-viaje-oscuro",
+    "id": "27076daf1ad9492085d62f1f9b6fd317",
+    "device": "MOBILE"
+  },
+  {
+    "titulo": "Viaje en curso (Oscuro)",
+    "archivo": "viaje-en-curso-oscuro",
+    "id": "01dbe2dd020644109bd47e316988ab60",
+    "device": "MOBILE"
+  }
+]

@@ -1,0 +1,148 @@
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed": "#dbe1ff", "secondary-fixed": "#6ffbbe", "outline-variant": "#c3c6d7", "surface-variant": "#e5e2e1", "on-tertiary-container": "#ffeedd", "inverse-on-surface": "#f3f0ef", "on-secondary": "#ffffff", "surface-container": "#f0eded", "surface-container-high": "#eae7e7", "inverse-surface": "#313030", "primary-container": "#2563eb", "outline": "#737686", "on-tertiary": "#ffffff", "on-secondary-fixed-variant": "#005236", "on-background": "#1c1b1b", "surface-bright": "#fcf9f8", "on-primary-fixed-variant": "#003ea8", "primary-fixed-dim": "#b4c5ff", "inverse-primary": "#b4c5ff", "surface-container-highest": "#e5e2e1", "on-tertiary-fixed-variant": "#653e00", "secondary-container": "#6cf8bb", "on-primary-container": "#eeefff", "surface-container-low": "#f6f3f2", "secondary": "#006c49", "surface-container-lowest": "#ffffff", "tertiary-fixed-dim": "#ffb95f", "surface-tint": "#0053db", "on-error-container": "#93000a", "tertiary": "#784b00", "on-secondary-fixed": "#002113", "surface": "#fcf9f8", "on-primary": "#ffffff", "on-tertiary-fixed": "#2a1700", "on-error": "#ffffff", "tertiary-fixed": "#ffddb8", "secondary-fixed-dim": "#4edea3", "on-secondary-container": "#00714d", "on-primary-fixed": "#00174b", "tertiary-container": "#996100", "surface-dim": "#dcd9d9", "error": "#ba1a1a", "on-surface": "#1c1b1b", "on-surface-variant": "#434655", "primary": "#004ac6", "error-container": "#ffdad6", "background": "#fcf9f8" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "padding-card": "16px", "touch-target-min": "56px", "margin-screen": "16px", "gutter-stack": "12px", "touch-target-primary": "64px" }, "fontFamily": { "button-text": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "label-caps": ["Inter"], "display-data": ["Inter"], "body-lg": ["Inter"] }, "fontSize": { "button-text": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-caps": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }], "display-data": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }] } } } };</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; } .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); } } </style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-md text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin-screen flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center text-on-surface" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button><h1 class="font-headline-md text-headline-md text-on-surface">Detalle De Ruta</h1></div></header><main class="pt-16 pb-safe min-h-screen bg-background"><div class="flex flex-col w-full h-full">
+<div class="px-margin-screen py-4 flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Antes de salir</h2>
+<span class="font-label-caps text-label-caps text-primary" id="counter-display">0 de 5</span>
+</div>
+<div class="flex-1 overflow-y-auto px-margin-screen pb-[96px]">
+<div class="flex flex-col gap-gutter-stack" id="checklist-container">
+<!-- Item 1: Luces -->
+<div class="flex flex-col gap-2 rounded-xl bg-surface-container p-padding-card checklist-item" data-id="1">
+<div class="flex items-center justify-between min-h-touch-target-min">
+<span class="font-body-lg text-body-lg text-on-surface flex-1 truncate pr-4">Luces</span>
+<div class="flex items-center gap-2">
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="mal">MAL</button>
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="bien">BIEN</button>
+</div>
+</div>
+<div class="hidden error-note pl-2 py-2 flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+<span class="font-body-md text-body-md">Añadir nota/foto requerida</span>
+</div>
+</div>
+<!-- Item 2: Frenos -->
+<div class="flex flex-col gap-2 rounded-xl bg-surface-container p-padding-card checklist-item" data-id="2">
+<div class="flex items-center justify-between min-h-touch-target-min">
+<span class="font-body-lg text-body-lg text-on-surface flex-1 truncate pr-4">Frenos</span>
+<div class="flex items-center gap-2">
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="mal">MAL</button>
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="bien">BIEN</button>
+</div>
+</div>
+<div class="hidden error-note pl-2 py-2 flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+<span class="font-body-md text-body-md">Añadir nota/foto requerida</span>
+</div>
+</div>
+<!-- Item 3: Llantas -->
+<div class="flex flex-col gap-2 rounded-xl bg-surface-container p-padding-card checklist-item" data-id="3">
+<div class="flex items-center justify-between min-h-touch-target-min">
+<span class="font-body-lg text-body-lg text-on-surface flex-1 truncate pr-4">Llantas</span>
+<div class="flex items-center gap-2">
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="mal">MAL</button>
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="bien">BIEN</button>
+</div>
+</div>
+<div class="hidden error-note pl-2 py-2 flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+<span class="font-body-md text-body-md">Añadir nota/foto requerida</span>
+</div>
+</div>
+<!-- Item 4: Nivel de aceite -->
+<div class="flex flex-col gap-2 rounded-xl bg-surface-container p-padding-card checklist-item" data-id="4">
+<div class="flex items-center justify-between min-h-touch-target-min">
+<span class="font-body-lg text-body-lg text-on-surface flex-1 truncate pr-4">Nivel de aceite</span>
+<div class="flex items-center gap-2">
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="mal">MAL</button>
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="bien">BIEN</button>
+</div>
+</div>
+<div class="hidden error-note pl-2 py-2 flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+<span class="font-body-md text-body-md">Añadir nota/foto requerida</span>
+</div>
+</div>
+<!-- Item 5: Extintor -->
+<div class="flex flex-col gap-2 rounded-xl bg-surface-container p-padding-card checklist-item" data-id="5">
+<div class="flex items-center justify-between min-h-touch-target-min">
+<span class="font-body-lg text-body-lg text-on-surface flex-1 truncate pr-4">Extintor</span>
+<div class="flex items-center gap-2">
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="mal">MAL</button>
+<button class="h-14 w-20 rounded-lg bg-surface flex items-center justify-center font-button-text text-button-text text-on-surface border border-outline shadow-sm btn-status" data-status="bien">BIEN</button>
+</div>
+</div>
+<div class="hidden error-note pl-2 py-2 flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+<span class="font-body-md text-body-md">Añadir nota/foto requerida</span>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 w-full px-margin-screen py-4 bg-surface/90 backdrop-blur-md pb-safe">
+<button class="w-full h-touch-target-primary rounded-xl bg-primary text-on-primary font-button-text text-button-text shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-surface-variant disabled:text-on-surface-variant transition-colors" disabled="" id="btn-submit">
+<span class="material-symbols-outlined">check_circle</span>
+      Terminar checklist
+    </button>
+</div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const totalItems = 5;
+    let completedItems = 0;
+    const completedMap = new Map();
+
+    const items = document.querySelectorAll('.checklist-item');
+    const counterDisplay = document.getElementById('counter-display');
+    const btnSubmit = document.getElementById('btn-submit');
+
+    items.forEach(item => {
+      const id = item.dataset.id;
+      const btns = item.querySelectorAll('.btn-status');
+      const errorNote = item.querySelector('.error-note');
+
+      btns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const status = e.currentTarget.dataset.status;
+          
+          // Reset styles for both buttons
+          btns.forEach(b => {
+            b.classList.remove('bg-secondary', 'text-on-secondary', 'bg-error', 'text-on-error', 'border-transparent');
+            b.classList.add('bg-surface', 'text-on-surface', 'border-outline');
+          });
+
+          // Apply active styles
+          if (status === 'bien') {
+            e.currentTarget.classList.remove('bg-surface', 'text-on-surface', 'border-outline');
+            e.currentTarget.classList.add('bg-secondary', 'text-on-secondary', 'border-transparent');
+            errorNote.classList.add('hidden');
+          } else {
+            e.currentTarget.classList.remove('bg-surface', 'text-on-surface', 'border-outline');
+            e.currentTarget.classList.add('bg-error', 'text-on-error', 'border-transparent');
+            errorNote.classList.remove('hidden');
+          }
+
+          if (!completedMap.has(id)) {
+            completedMap.set(id, true);
+            completedItems++;
+            updateCounter();
+          }
+        });
+      });
+    });
+
+    function updateCounter() {
+      counterDisplay.textContent = `${completedItems} de ${totalItems}`;
+      if (completedItems === totalItems) {
+        btnSubmit.disabled = false;
+        btnSubmit.classList.add('animate-pulse');
+        setTimeout(() => btnSubmit.classList.remove('animate-pulse'), 1000);
+      }
+    }
+  });
+</script></main></body></html>

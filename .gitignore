@@ -1,0 +1,54 @@
+# Dependencias
+node_modules/
+.pnp/
+.pnp.js
+
+# Build nativo
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+ios/build/
+ios/Pods/
+ios/*.xcworkspace/xcuserdata/
+*.hprof
+
+# Artefactos de la app — se distribuyen fuera del repo (ver §6 del spec)
+*.apk
+*.aab
+*.ipa
+
+# Firma — perder la keystore obliga a reinstalar en TODOS los teléfonos.
+# Se respalda fuera del repo, nunca acá.
+*.keystore
+*.jks
+!debug.keystore
+
+# Expo / Metro
+.expo/
+.expo-shared/
+dist/
+web-build/
+.metro-health-check*
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Logs y temporales
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+*.tsbuildinfo
+
+# Cobertura y tests
+coverage/
+
+# Expo CNG: android/ e ios/ se GENERAN con `npm run prebuild`. No se commitean —
+# tenerlos versionados y además generarlos es la receta para que la config de
+# app.json y la nativa se separen sin que nadie lo note.
+/android
+/ios

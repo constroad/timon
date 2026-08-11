@@ -1,0 +1,20 @@
+# Volvió la señal: la cola se vacía sola (Timón · A4).
+#
+# Se corre DESPUÉS de `offline-registrar.yaml` y de reactivar la red con
+# `adb shell svc data enable` / `svc wifi enable`.
+#
+# La app se vuelve a abrir a propósito: prueba de paso que lo pendiente
+# sobrevivió en disco al cierre, que es lo que pasa cuando el sistema mata la
+# app en el bolsillo del chofer.
+appId: com.constroad.timon
+---
+- launchApp
+
+# Al volver al frente la cola se despierta sin esperar el backoff.
+- assertVisible: "Hola, Pedro Ramirez"
+
+# La cola se despierta al volver la app al frente, sin esperar el backoff.
+- extendedWaitUntil:
+    notVisible:
+      id: "cola-pendiente"
+    timeout: 40000

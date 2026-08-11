@@ -1,0 +1,97 @@
+# Sin ubicación no arranca el viaje (Timón · A5 §4.6).
+#
+# Decisión de José del 07/08/2026, tomada contra la recomendación contraria. Lo
+# que se prueba es que el bloqueo sea REAL: con la ubicación del sistema apagada,
+# un checklist LIMPIO no alcanza para salir.
+#
+# La ubicación del sistema se apaga desde afuera:
+#   adb shell settings put secure location_mode 0
+#
+# Sembrar sin flags. NO hay `launchApp`: la app viene del flujo de alta.
+appId: com.constroad.timon
+---
+# Con la ubicación apagada Android muestra SU propio aviso encima de la app
+# («No location access»). No es de Timón, pero el chofer lo va a ver primero.
+- runFlow:
+    when:
+      visible: "Close"
+    commands:
+      - tapOn: "Close"
+
+- assertVisible: "Hola, Pedro Ramirez"
+- assertVisible: "TU PRÓXIMO VIAJE"
+
+# El botón dice lo que el SERVER permite ahora, no un texto fijo del cliente.
+- tapOn:
+    id: "accion-viaje"
+
+# Iniciar pasa siempre por el checklist: es la evidencia de que alguien miró la
+# unidad antes de salir.
+- assertVisible: "Antes de salir"
+
+# Se responde en el ORDEN del catálogo y con `scrollUntilVisible`: la lista no
+# entra en una pantalla y Maestro no hace scroll solo — tocar por id un ítem
+# fuera de vista falla sin decir que el problema era el scroll.
+- scrollUntilVisible:
+    element:
+      id: "check-bien-frenos"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-frenos"
+
+- tapOn:
+    id: "check-bien-luces"
+
+- scrollUntilVisible:
+    element:
+      id: "check-bien-llantas"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-llantas"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-fugas"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-fugas"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-espejos"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-espejos"
+- scrollUntilVisible:
+    element:
+      id: "check-bien-docs"
+    direction: DOWN
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    id: "check-bien-docs"
+
+- tapOn:
+    id: "checklist-confirmar"
+
+# Antes del bloqueo propio aparece el de Android: al pedir posición con la
+# ubicación apagada, Google ofrece prenderla. Es MEJOR que el mensaje de Timón
+# —resuelve el problema en vez de nombrarlo— y por eso el chofer lo ve primero.
+# El bloqueo propio es lo que queda si dice que no.
+- runFlow:
+    when:
+      visible: "No thanks"
+    commands:
+      - tapOn: "No thanks"
+
+# El checklist está limpio y aun así NO sale: falta el fix. El permiso
+# concedido no alcanza — un teléfono con el GPS del sistema apagado tiene el
+# permiso dado y no da posición.
+- assertVisible: "Prende la ubicación para iniciar el viaje."
+- assertVisible: "Programado"

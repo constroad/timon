@@ -1,0 +1,176 @@
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#fcf9f8;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary-fixed":"#dbe1ff","on-secondary-fixed-variant":"#005236","on-surface":"#1c1b1b","on-secondary":"#ffffff","on-primary":"#ffffff","background":"#fcf9f8","on-primary-fixed-variant":"#003ea8","inverse-on-surface":"#f3f0ef","on-tertiary-fixed-variant":"#653e00","inverse-primary":"#b4c5ff","surface-container-high":"#eae7e7","tertiary-fixed-dim":"#ffb95f","surface":"#fcf9f8","secondary-fixed":"#6ffbbe","on-tertiary-fixed":"#2a1700","surface-container-low":"#f6f3f2","surface-container":"#f0eded","outline-variant":"#c3c6d7","surface-container-lowest":"#ffffff","tertiary-fixed":"#ffddb8","error":"#ba1a1a","secondary-container":"#6cf8bb","surface-tint":"#0053db","on-secondary-fixed":"#002113","outline":"#737686","tertiary-container":"#996100","on-surface-variant":"#434655","secondary-fixed-dim":"#4edea3","on-background":"#1c1b1b","surface-dim":"#dcd9d9","primary-fixed-dim":"#b4c5ff","surface-container-highest":"#e5e2e1","tertiary":"#784b00","surface-bright":"#fcf9f8","on-error":"#ffffff","inverse-surface":"#313030","on-tertiary-container":"#ffeedd","error-container":"#ffdad6","surface-variant":"#e5e2e1","primary":"#004ac6","on-secondary-container":"#00714d","secondary":"#006c49","on-error-container":"#93000a","on-tertiary":"#ffffff","primary-container":"#2563eb","on-primary-fixed":"#00174b","on-primary-container":"#eeefff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"touch-target-primary":"64px","margin-screen":"16px","padding-card":"16px","touch-target-min":"56px","gutter-stack":"12px"},"fontFamily":{"headline-md":["Inter"],"body-lg":["Inter"],"display-data":["Inter"],"label-caps":["Inter"],"body-md":["Inter"],"button-text":["Inter"]},"fontSize":{"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"26px","fontWeight":"400"}],"display-data":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-caps":["14px",{"lineHeight":"20px","letterSpacing":"0.05em","fontWeight":"600"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"button-text":["18px",{"lineHeight":"24px","fontWeight":"600"}]}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-md text-on-background min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-screen flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center rounded-full active:bg-surface-container"><span class="material-symbols-outlined text-on-surface">arrow_back</span></button><h1 class="font-headline-md text-headline-md text-on-surface truncate">Firmar Entrega</h1></div></header><main class="pt-16 pb-12 px-margin-screen bg-background"><div class="flex flex-col w-full h-full pb-safe">
+<div class="flex flex-col px-gutter pt-stack-lg gap-stack-lg flex-1">
+<!-- Delivery Header Info -->
+<div class="flex flex-col gap-stack-sm text-center items-center justify-center pt-stack-md pb-stack-lg bg-surface-container-low rounded-xl shadow-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/5 to-transparent pointer-events-none"></div>
+<div class="w-touch-target h-touch-target bg-primary-fixed-dim/20 rounded-full flex items-center justify-center mb-stack-sm">
+<span class="material-symbols-outlined text-display-lg text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Entrega #892-A</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+            Av. Insurgentes Sur 105
+        </p>
+</div>
+<!-- Receiver Name Input -->
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1" for="receiver-name">Nombre de quien recibe</label>
+<div class="relative flex items-center bg-surface-container rounded-xl h-touch-target px-gutter focus-within:ring-2 focus-within:ring-primary-container transition-shadow">
+<span class="material-symbols-outlined text-outline mr-3">person</span>
+<input class="w-full bg-transparent font-body-lg text-body-lg text-on-surface placeholder-outline focus:outline-none" id="receiver-name" placeholder="Ej. Juan Pérez" type="text"/>
+</div>
+</div>
+<!-- Signature Area -->
+<div class="flex flex-col gap-stack-sm flex-1 mb-stack-md">
+<div class="flex justify-between items-end ml-1 mb-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Firma del cliente</label>
+<button class="font-label-sm text-label-sm text-primary flex items-center gap-1 bg-transparent active:opacity-70 transition-opacity p-2 rounded-lg" id="clear-signature">
+<span class="material-symbols-outlined text-[16px]">refresh</span> Limpiar
+            </button>
+</div>
+<div class="relative w-full h-[300px] bg-surface-container-highest rounded-xl shadow-inner border-b-2 border-primary/20 overflow-hidden touch-none" id="signature-container">
+<!-- Instructional overlay -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 transition-opacity duration-300" id="signature-placeholder">
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-display-lg text-on-surface-variant">draw</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Firme aquí</span>
+</div>
+</div>
+<!-- Dotted baseline -->
+<div class="absolute bottom-[20%] left-[10%] right-[10%] h-[2px] border-b-2 border-dashed border-outline-variant pointer-events-none"></div>
+<!-- Canvas for drawing -->
+<canvas class="absolute inset-0 w-full h-full cursor-crosshair" id="signature-canvas"></canvas>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="px-gutter pb-gutter pt-stack-sm mt-auto bg-surface/90 backdrop-blur-md sticky bottom-0 border-t border-surface-container-highest">
+<button class="w-full h-touch-target bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-xl flex items-center justify-center gap-3 shadow-lg active:scale-[0.98] transition-transform" onclick="completeDelivery(this)">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+      Guardar Entrega
+    </button>
+</div>
+</div>
+<script>
+  // Simple signature canvas logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('signature-canvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('signature-container');
+    const placeholder = document.getElementById('signature-placeholder');
+    const clearBtn = document.getElementById('clear-signature');
+    
+    let isDrawing = false;
+    let hasSignature = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    // Resize canvas to fit container
+    function resizeCanvas() {
+        const rect = container.getBoundingClientRect();
+        // Scale for high DPI displays
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        
+        // Setup line style matching Ruta Pro Dark accent (using primary color hex approximation)
+        ctx.strokeStyle = '#afc6ff'; // primary color
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowBlur = 1;
+        ctx.shadowColor = '#afc6ff';
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function getCoordinates(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDrawing(e) {
+        e.preventDefault();
+        isDrawing = true;
+        const coords = getCoordinates(e);
+        lastX = coords.x;
+        lastY = coords.y;
+        
+        if (!hasSignature) {
+            hasSignature = true;
+            placeholder.style.opacity = '0';
+        }
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        
+        const coords = getCoordinates(e);
+        
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.stroke();
+        
+        lastX = coords.x;
+        lastY = coords.y;
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    function clearSignature() {
+        const dpr = window.devicePixelRatio || 1;
+        ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+        hasSignature = false;
+        placeholder.style.opacity = '0.4';
+    }
+
+    // Touch events
+    canvas.addEventListener('touchstart', startDrawing, {passive: false});
+    canvas.addEventListener('touchmove', draw, {passive: false});
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchcancel', stopDrawing);
+
+    // Mouse events for testing on desktop
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    clearBtn.addEventListener('click', clearSignature);
+  });
+
+  function completeDelivery(btn) {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Guardando...`;
+      btn.disabled = true;
+      btn.classList.add('opacity-80');
+      
+      setTimeout(() => {
+          btn.innerHTML = `<span class="material-symbols-outlined">done_all</span> Entrega Exitosa`;
+          btn.classList.remove('bg-primary-container', 'text-on-primary-container');
+          btn.classList.add('bg-secondary-container', 'text-on-secondary-container');
+          
+          // Optional: Create a subtle ripple/flash effect on the card
+          const card = document.querySelector('.bg-surface-container-low');
+          card.classList.add('ring-2', 'ring-secondary-container');
+          setTimeout(() => card.classList.remove('ring-2', 'ring-secondary-container'), 500);
+      }, 1200);
+  }
+</script></main></body></html>

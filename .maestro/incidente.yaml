@@ -1,0 +1,24 @@
+# Reportar un siniestro desde la carretera (Timón · A3).
+#
+# Lo llena alguien que acaba de chocar: tipo de un toque, una línea de
+# descripción, y el lugar OPCIONAL — quien volcó no sabe el kilómetro exacto.
+appId: com.constroad.timon
+---
+- launchApp
+- assertVisible: "Hola, Pedro Ramirez"
+
+- tapOn:
+    id: "abrir-incidente"
+- assertVisible: "¿Qué pasó?"
+
+- tapOn:
+    id: "incidente-choque"
+- tapOn:
+    id: "incidente-descripcion"
+- inputText: "Nos chocó una combi por atrás en el desvío"
+
+# El lugar se deja vacío a propósito: es el camino que NO puede frenar el aviso.
+
+- tapOn:
+    id: "incidente-enviar"
+- assertVisible: "Reporte enviado"

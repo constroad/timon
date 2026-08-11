@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Timón",
+    "slug": "timon",
+    "scheme": "timon",
+    "version": "0.1.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.constroad.timon",
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location"
+        ],
+        "NSLocationWhenInUseUsageDescription": "Timón comparte tu ubicación mientras tienes un viaje en curso, para que tu oficina y tu cliente vean dónde va la carga.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Con el permiso «Siempre», tu ubicación se comparte también con la pantalla apagada mientras manejas. Se activa al iniciar un viaje y se apaga al entregar.",
+        "NSCameraUsageDescription": "Para tomar las fotos de la carga, los vales y las constancias de entrega."
+      }
+    },
+    "android": {
+      "package": "com.constroad.timon",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "CAMERA",
+        "RECEIVE_BOOT_COMPLETED"
+      ],
+      "usesCleartextTraffic": true,
+      "versionCode": 1
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Con el permiso «Siempre», tu ubicación se comparte también con la pantalla apagada mientras manejas. Se activa al iniciar un viaje y se apaga al entregar.",
+          "locationWhenInUsePermission": "Timón comparte tu ubicación mientras tienes un viaje en curso.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      "expo-secure-store",
+      "./plugins/withReleaseSigning"
+    ]
+  }
+}

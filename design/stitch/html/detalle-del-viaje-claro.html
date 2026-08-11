@@ -1,0 +1,157 @@
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed": "#dbe1ff", "secondary-fixed": "#6ffbbe", "outline-variant": "#c3c6d7", "surface-variant": "#e5e2e1", "on-tertiary-container": "#ffeedd", "inverse-on-surface": "#f3f0ef", "on-secondary": "#ffffff", "surface-container": "#f0eded", "surface-container-high": "#eae7e7", "inverse-surface": "#313030", "primary-container": "#2563eb", "outline": "#737686", "on-tertiary": "#ffffff", "on-secondary-fixed-variant": "#005236", "on-background": "#1c1b1b", "surface-bright": "#fcf9f8", "on-primary-fixed-variant": "#003ea8", "primary-fixed-dim": "#b4c5ff", "inverse-primary": "#b4c5ff", "surface-container-highest": "#e5e2e1", "on-tertiary-fixed-variant": "#653e00", "secondary-container": "#6cf8bb", "on-primary-container": "#eeefff", "surface-container-low": "#f6f3f2", "secondary": "#006c49", "surface-container-lowest": "#ffffff", "tertiary-fixed-dim": "#ffb95f", "surface-tint": "#0053db", "on-error-container": "#93000a", "tertiary": "#784b00", "on-secondary-fixed": "#002113", "surface": "#fcf9f8", "on-primary": "#ffffff", "on-tertiary-fixed": "#2a1700", "on-error": "#ffffff", "tertiary-fixed": "#ffddb8", "secondary-fixed-dim": "#4edea3", "on-secondary-container": "#00714d", "on-primary-fixed": "#00174b", "tertiary-container": "#996100", "surface-dim": "#dcd9d9", "error": "#ba1a1a", "on-surface": "#1c1b1b", "on-surface-variant": "#434655", "primary": "#004ac6", "error-container": "#ffdad6", "background": "#fcf9f8" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "padding-card": "16px", "touch-target-min": "56px", "margin-screen": "16px", "gutter-stack": "12px", "touch-target-primary": "64px" }, "fontFamily": { "button-text": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "label-caps": ["Inter"], "display-data": ["Inter"], "body-lg": ["Inter"] }, "fontSize": { "button-text": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-caps": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }], "display-data": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }] } } } };</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; } .pb-safe { padding-bottom: env(safe-area-inset-bottom); } .pt-safe { padding-top: env(safe-area-inset-top); } } </style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-body-md text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin-screen flex items-center gap-4"><button class="w-10 h-10 flex items-center justify-center text-on-surface" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button><h1 class="font-headline-md text-headline-md text-on-surface">Detalle De Ruta</h1></div></header><main class="pt-16 pb-safe min-h-screen bg-background"><div class="flex flex-col w-full h-full relative bg-surface">
+<!-- Encabezado de Viaje -->
+<div class="px-margin-screen py-6 bg-surface flex flex-col gap-4">
+<div class="flex justify-between items-start gap-4">
+<div class="flex flex-col gap-1 flex-1">
+<h2 class="font-display-data text-display-data text-on-surface">Lima → Chincha</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-[18px]">route</span>
+          184 km, aprox. 3h 15m
+        </p>
+</div>
+<div class="bg-secondary-container px-3 py-1 rounded-full flex items-center justify-center shrink-0">
+<span class="font-label-caps text-label-caps text-on-secondary-container">EN CURSO</span>
+</div>
+</div>
+</div>
+<!-- Detalles de Operación (Bento Grid) -->
+<div class="px-margin-screen pb-6 flex flex-col gap-gutter-stack">
+<div class="grid grid-cols-2 gap-gutter-stack">
+<div class="bg-surface-container rounded-xl p-padding-card flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+           Fecha
+        </span>
+<span class="font-headline-md text-headline-md text-on-surface">Hoy, 24 Oct</span>
+</div>
+<div class="bg-surface-container rounded-xl p-padding-card flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">local_shipping</span>
+           Placa
+        </span>
+<span class="font-headline-md text-headline-md text-on-surface">AXF-982</span>
+</div>
+<div class="bg-surface-container rounded-xl p-padding-card flex flex-col gap-2 col-span-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+           Carga y Cliente
+        </span>
+<div class="flex justify-between items-end">
+<span class="font-body-lg text-body-lg text-on-surface">Materiales const.</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Constructora S.A.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Barra de Progreso Hitos -->
+<div class="px-margin-screen pb-8">
+<div class="bg-surface-container rounded-xl p-padding-card flex flex-col gap-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Estado del viaje</h3>
+<div class="relative flex justify-between items-center w-full px-2 mt-2">
+<!-- Background line -->
+<div class="absolute top-1/2 left-0 w-full h-[2px] bg-outline-variant -translate-y-1/2 z-0"></div>
+<!-- Active line -->
+<div class="absolute top-1/2 left-0 w-1/2 h-[2px] bg-primary -translate-y-1/2 z-0"></div>
+<!-- Hito 1: Programado -->
+<div class="relative z-10 flex flex-col items-center gap-2 group">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="font-label-caps text-[12px] leading-[16px] font-semibold text-primary absolute -bottom-6 whitespace-nowrap">Programado</span>
+</div>
+<!-- Hito 2: En Ruta -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-4 ring-primary-container/30">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<span class="font-label-caps text-[12px] leading-[16px] font-semibold text-primary absolute -bottom-6 whitespace-nowrap">En ruta</span>
+</div>
+<!-- Hito 3: Entregado -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container border-2 border-outline-variant flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[20px]">where_to_vote</span>
+</div>
+<span class="font-label-caps text-[12px] leading-[16px] font-semibold text-on-surface-variant absolute -bottom-6 whitespace-nowrap">Entregado</span>
+</div>
+</div>
+<div class="h-6"></div> <!-- Spacer for labels -->
+</div>
+</div>
+<!-- Secciones Desplegables -->
+<div class="px-margin-screen pb-32 flex flex-col gap-2">
+<!-- Accordion 1 -->
+<details class="group bg-surface-container rounded-xl overflow-hidden" open="">
+<summary class="flex justify-between items-center p-padding-card cursor-pointer list-none touch-target-min">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">location_on</span>
+<span class="font-headline-md text-headline-md text-on-surface">Entregas (1)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface transition-transform duration-200 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-padding-card pb-padding-card pt-0 flex flex-col gap-3">
+<div class="bg-surface rounded-lg p-4 flex flex-col gap-2">
+<div class="flex justify-between">
+<span class="font-label-caps text-label-caps text-secondary">Pendiente</span>
+<span class="font-body-md text-body-md text-on-surface-variant">14:00 hrs</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">Almacén Central Chincha</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Av. Industrial 450, Mz. Lote 2</span>
+</div>
+</div>
+</details>
+<!-- Accordion 2 -->
+<details class="group bg-surface-container rounded-xl overflow-hidden">
+<summary class="flex justify-between items-center p-padding-card cursor-pointer list-none touch-target-min">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+<span class="font-headline-md text-headline-md text-on-surface">Documentos (3)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface transition-transform duration-200 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-padding-card pb-padding-card pt-0 flex flex-col gap-2">
+<div class="flex items-center justify-between bg-surface p-3 rounded-lg">
+<span class="font-body-md text-body-md text-on-surface">Guía Remisión</span>
+<span class="material-symbols-outlined text-primary">download</span>
+</div>
+<div class="flex items-center justify-between bg-surface p-3 rounded-lg">
+<span class="font-body-md text-body-md text-on-surface">Manifiesto Carga</span>
+<span class="material-symbols-outlined text-primary">download</span>
+</div>
+</div>
+</details>
+<!-- Accordion 3 -->
+<details class="group bg-surface-container rounded-xl overflow-hidden">
+<summary class="flex justify-between items-center p-padding-card cursor-pointer list-none touch-target-min">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">photo_camera</span>
+<span class="font-headline-md text-headline-md text-on-surface">Fotos de Carga</span>
+</div>
+<span class="material-symbols-outlined text-on-surface transition-transform duration-200 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-padding-card pb-padding-card pt-0">
+<div class="grid grid-cols-3 gap-2">
+<div class="aspect-square bg-surface rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant text-outline-variant">
+<span class="material-symbols-outlined">add_a_photo</span>
+</div>
+</div>
+</div>
+</details>
+</div>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/95 backdrop-blur-sm p-margin-screen pb-safe shadow-[0_-4px_16px_rgba(0,0,0,0.05)] z-40">
+<button class="w-full h-[64px] bg-primary text-on-primary rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 active:bg-primary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">playlist_add_check</span>
+      Hacer checklist
+    </button>
+</div>
+</div>
+<script>
+  // Simple rotation for details arrows is handled by CSS, no complex JS needed for basic accordion
+</script></main></body></html>
