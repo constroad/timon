@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { checkSession, fetchMinVersion } from './src/api/client';
@@ -6,6 +6,8 @@ import { clearCredential, loadCredential, type StoredCredential } from './src/au
 import { OnboardingFlow } from './src/onboarding/OnboardingFlow';
 import { TripsScreen } from './src/trips/TripsScreen';
 import { AttendanceScreen } from './src/attendance/AttendanceScreen';
+import { AppHeader } from './src/ui/AppHeader';
+import { AppMenuSheet } from './src/ui/AppMenuSheet';
 import { applyAccent, theme } from './src/ui/theme';
 import { resolveVersionGate, type VersionGate } from './src/version/gate';
 import { useVersionGate } from './src/version/useVersionGate';
@@ -26,13 +28,28 @@ import appConfig from './app.json';
 type Boot =
   | { phase: 'cargando' }
   | { phase: 'alta' }
-  | { phase: 'adentro'; credential: StoredCredential; attendance: boolean }
+  | {
+      phase: 'adentro';
+      credential: StoredCredential;
+      attendance: boolean;
+      companyName?: string;
+      companyLogoUrl?: string;
+      driverName?: string;
+    }
   | { phase: 'actualizar'; gate: VersionGate };
 
 export default function App() {
   const [boot, setBoot] = useState<Boot>({ phase: 'cargando' });
   /** Los dos menús del pedido. Arranca en viajes: es lo que se mira todo el día. */
   const [menu, setMenu] = useState<'viajes' | 'asistencia'>('viajes');
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  /**
+   * «Ahora no» de la pantalla de actualización. Vive en MEMORIA a propósito:
+   * al volver a abrir la app la compuerta pregunta de nuevo. Saltar es por
+   * esta vez —para no dejar a nadie tirado en medio de un viaje—, no para
+   * siempre.
+   */
+  const saltoActualizacionRef = useRef(false);
   /**
    * S6: la compuerta sigue viva con la app abierta. El chofer no cierra Timón
    * en todo el turno, así que un contrato que cambia a media mañana tiene que
@@ -50,7 +67,9 @@ export default function App() {
       minimum: minVersion,
       downloadUrl,
     });
-    if (gate.blocked) {
+    // El salto vale para esta sesión: `resume` se llama de nuevo al reabrir la
+    // app y ahí el ref vuelve a `false`, así que la compuerta pregunta otra vez.
+    if (gate.blocked && !saltoActualizacionRef.current) {
       setBoot({ phase: 'actualizar', gate });
       return;
     }
@@ -63,7 +82,15 @@ export default function App() {
     try {
       const session = await checkSession(credential);
       applyAccent(session.company.accentColor);
-      setBoot({ phase: 'adentro', credential, attendance: session.capabilities.attendance });
+      setBoot({
+        phase: 'adentro',
+        credential,
+        attendance: session.capabilities.attendance,
+        // Para la cabecera: el chofer tiene que ver DÓNDE trabaja al abrir la app.
+        companyName: session.company?.name,
+        companyLogoUrl: session.company?.logoUrl ?? undefined,
+        driverName: session.driver?.name,
+      });
     } catch {
       // Revocado, chofer dado de baja o empresa desactivada: se borra el alta y
       // se empieza de nuevo, en vez de dejarlo con una llave que no abre.
@@ -101,7 +128,13 @@ export default function App() {
     return (
       <View style={styles.fill}>
         <StatusBar style="auto" />
-        <UpdateRequiredScreen gate={boot.gate} />
+        <UpdateRequiredScreen
+          gate={boot.gate}
+          onSkip={() => {
+            saltoActualizacionRef.current = true;
+            void resume();
+          }}
+        />
       </View>
     );
   }
@@ -131,6 +164,27 @@ export default function App() {
   return (
     <View style={styles.fill}>
       <StatusBar style="auto" />
+      <AppHeader
+        companyName={boot.companyName}
+        companyLogoUrl={boot.companyLogoUrl}
+        onOpenMenu={() => setMenuAbierto(true)}
+      />
+      <AppMenuSheet
+        visible={menuAbierto}
+        onClose={() => setMenuAbierto(false)}
+        companyName={boot.companyName}
+        driverName={boot.driverName}
+        attendanceEnabled={boot.attendance}
+        onGoTrips={() => setMenu('viajes')}
+        onGoAttendance={() => setMenu('asistencia')}
+        onLogout={salir}
+        onCheckUpdates={() => {
+          // Se vuelve a preguntar al server: si hay versión nueva, `resume`
+          // lleva a la pantalla de actualización con su enlace.
+          saltoActualizacionRef.current = false;
+          void resume();
+        }}
+      />
       <View style={styles.fill}>
         {menu === 'asistencia' && boot.attendance ? (
           <AttendanceScreen credential={boot.credential} />

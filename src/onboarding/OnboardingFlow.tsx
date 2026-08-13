@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -14,6 +14,8 @@ import {
 import { ApiError, requestOtp, resolveCompany, verifyOtp } from '../api/client';
 import { deviceLabel, generateDeviceIdentity, saveCredential } from '../auth/credential';
 import { theme } from '../ui/theme';
+import { formatCode, isCompleteCode, shouldAutoSubmitOtp } from './code';
+import { QrScannerSheet } from './QrScannerSheet';
 import {
   canSubmit,
   initialOnboardingState,
@@ -34,12 +36,6 @@ import {
  * que hay que teclear.
  */
 
-const formatCode = (raw: string): string => {
-  const clean = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-  return [clean.slice(0, 4), clean.slice(4, 8), clean.slice(8)].filter(Boolean).join('-');
-};
-
-const isCompleteCode = (code: string) => code.replace(/[^A-Z0-9]/g, '').length === 10;
 
 const formatPhone = (raw: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, 9);
@@ -52,6 +48,8 @@ export const OnboardingFlow = ({
   onDone: (result: { company: OnboardingCompany; driverName: string | null }) => void;
 }) => {
   const [state, dispatch] = useReducer(onboardingReducer, initialOnboardingState);
+
+  const [escanerAbierto, setEscanerAbierto] = useState(false);
 
   const fail = useCallback((error: unknown, kind?: 'otp') => {
     const message =
@@ -122,6 +120,22 @@ export const OnboardingFlow = ({
 
   const enabled = canSubmit(state, isCompleteCode);
 
+  /**
+   * Con los 6 dígitos escritos se verifica solo: el teclado numérico tapa el
+   * botón y buscarlo es un paso de más. `ultimoOtpRef` evita el bucle — un
+   * código rechazado no se reenvía a sí mismo hasta agotar los intentos.
+   */
+  const ultimoOtpRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (state.step !== 'verificar') {
+      ultimoOtpRef.current = null;
+      return;
+    }
+    if (!shouldAutoSubmitOtp(state, ultimoOtpRef.current)) return;
+    ultimoOtpRef.current = state.otp;
+    void submitOtp();
+  }, [state, submitOtp]);
+
   return (
     <KeyboardAvoidingView
       style={styles.fill}
@@ -144,6 +158,21 @@ export const OnboardingFlow = ({
               autoCorrect={false}
               accessibilityLabel="Código de empresa"
               testID="input-codigo-empresa"
+            />
+            {/* Atajo, no requisito: si la cámara falla o no hay permiso, el
+                código se escribe igual. */}
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setEscanerAbierto(true)}
+              style={styles.scanButton}
+              testID="btn-escanear-qr"
+            >
+              <Text style={styles.scanButtonText}>Escanear código QR</Text>
+            </Pressable>
+            <QrScannerSheet
+              visible={escanerAbierto}
+              onClose={() => setEscanerAbierto(false)}
+              onCode={(code) => dispatch({ type: 'escribir-codigo', value: code })}
             />
           </>
         )}
@@ -272,6 +301,17 @@ export const OnboardingFlow = ({
 };
 
 const styles = StyleSheet.create({
+  // 56 px como los campos: se toca con una mano dentro de la cabina.
+  scanButton: {
+    alignItems: 'center',
+    borderColor: theme.accent,
+    borderRadius: 14,
+    borderWidth: 2,
+    justifyContent: 'center',
+    marginTop: 12,
+    minHeight: 56,
+  },
+  scanButtonText: { color: theme.accent, fontSize: 16, fontWeight: '700' },
   fill: { flex: 1, backgroundColor: theme.background },
   page: { flexGrow: 1, justifyContent: 'center', padding: 24, gap: 12 },
   center: { alignItems: 'center', gap: 12 },

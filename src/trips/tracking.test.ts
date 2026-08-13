@@ -1,4 +1,4 @@
-import { formatEta, trackingStatusLabel } from './tracking';
+import { formatEta, resolveLocationWarning, trackingStatusLabel } from './tracking';
 
 /**
  * Lo que el chofer lee sobre su propio rastreo. La regla: cuando algo está mal,
@@ -37,5 +37,46 @@ describe('trackingStatusLabel', () => {
 
   it('sin seguimiento no dice nada', () => {
     expect(trackingStatusLabel(null)).toBeNull();
+  });
+});
+
+describe('trackingStatusLabel — con lo que la app ya envió', () => {
+  /**
+   * El caso real (13/08/2026): la app mandó la primera posición y el cartel
+   * seguía diciendo «todavía no llega a la oficina», porque el payload en
+   * pantalla era anterior al envío y nadie lo refresca. La app SABE que envió:
+   * decir lo contrario es mentirle al chofer sobre su propio rastreo.
+   */
+  it('si la app acaba de enviar, la oficina lo está viendo', () => {
+    expect(trackingStatusLabel({ live: false, progressPct: 0 }, true)).toBe(
+      'La oficina te está viendo'
+    );
+  });
+
+  it('sin envío propio, manda lo que dice el server', () => {
+    expect(trackingStatusLabel({ live: false, progressPct: 0 }, false)).toBe(
+      'Tu ubicación todavía no llega a la oficina.'
+    );
+  });
+});
+
+describe('resolveLocationWarning', () => {
+  /**
+   * Lo grave: con «solo mientras uso la app», el rastreo se corta al bloquear
+   * la pantalla y el chofer no se entera hasta que la oficina lo llama.
+   */
+  it('viaje en curso sin permiso de fondo: se avisa y se dice qué hacer', () => {
+    const aviso = resolveLocationWarning({ tripEnCurso: true, backgroundGranted: false });
+
+    expect(aviso).toContain('Ajustes');
+    expect(aviso).toContain('todo el tiempo');
+  });
+
+  it('con el permiso correcto, no molesta', () => {
+    expect(resolveLocationWarning({ tripEnCurso: true, backgroundGranted: true })).toBeNull();
+  });
+
+  it('sin viaje en curso tampoco molesta: todavía no hace falta', () => {
+    expect(resolveLocationWarning({ tripEnCurso: false, backgroundGranted: false })).toBeNull();
   });
 });

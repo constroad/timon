@@ -34,10 +34,33 @@ export function formatEta(etaAt?: string): string | null {
  * ubicación, buscar señal—. Decirle «sin señal» a secas lo deja mirando el
  * teléfono sin saber qué tocar.
  */
-export function trackingStatusLabel(tracking?: TripTracking | null): string | null {
+export function trackingStatusLabel(
+  tracking?: TripTracking | null,
+  sentFromThisPhone = false
+): string | null {
   if (!tracking) return null;
-  if (tracking.live) return 'La oficina te está viendo';
+  // La app sabe si acaba de mandar posiciones. El payload en pantalla puede ser
+  // anterior a ese envío —nadie lo refresca al vuelo— y sin esto el cartel dice
+  // «todavía no llega» con el rastro ya guardado en la oficina.
+  if (tracking.live || sentFromThisPhone) return 'La oficina te está viendo';
   return tracking.lastPositionAt
     ? 'Tu ubicación no llega hace rato. Revisa que esté prendida.'
     : 'Tu ubicación todavía no llega a la oficina.';
+}
+
+/**
+ * Aviso cuando el permiso de ubicación no alcanza para lo que el viaje necesita.
+ *
+ * Android ofrece «solo mientras uso la app» en el diálogo y **«todo el tiempo»
+ * solo desde Ajustes**. Con el primero, el rastreo se corta al bloquear la
+ * pantalla o cambiar de app — y el chofer no se entera hasta que la oficina lo
+ * llama preguntando dónde va. Por eso se nombra el camino exacto, no un «revisa
+ * los permisos».
+ */
+export function resolveLocationWarning(params: {
+  tripEnCurso: boolean;
+  backgroundGranted: boolean;
+}): string | null {
+  if (!params.tripEnCurso || params.backgroundGranted) return null;
+  return 'Tu ubicación solo se comparte con la app abierta. Ponla en «Permitir todo el tiempo» desde Ajustes para que siga con la pantalla apagada.';
 }

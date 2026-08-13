@@ -3,7 +3,7 @@
     "name": "Timón",
     "slug": "timon",
     "scheme": "timon",
-    "version": "0.1.0",
+    "version": "0.3.1",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -36,10 +36,11 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_LOCATION",
         "CAMERA",
-        "RECEIVE_BOOT_COMPLETED"
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.REQUEST_INSTALL_PACKAGES"
       ],
       "usesCleartextTraffic": true,
-      "versionCode": 1
+      "versionCode": 10
     },
     "plugins": [
       [
@@ -51,8 +52,23 @@
           "isAndroidForegroundServiceEnabled": true
         }
       ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Timón usa la cámara solo para leer el código QR de tu empresa."
+        }
+      ],
       "expo-secure-store",
-      "./plugins/withReleaseSigning"
+      "./plugins/withReleaseSigning",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ]
     ]
   }
 }

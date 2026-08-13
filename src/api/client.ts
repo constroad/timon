@@ -48,6 +48,7 @@ const credentialHeaders = (credential: StoredCredential) => ({
 
 export interface PortalPayload {
   companyName: string;
+  companyLogoUrl?: string;
   driverName: string;
   scope: 'driver' | 'trip';
   trips: PortalTrip[];

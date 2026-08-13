@@ -22,6 +22,7 @@ import { isTracking, startTracking, stopTracking } from './service';
 /** Cada cuánto se intenta subir lo juntado. Con red, casi siempre son pocos. */
 const UPLOAD_MS = 300_000;
 
+/** `true` en cuanto un lote llega bien: la app sabe que la oficina lo ve. */
 export function useTripTracking(params: {
   credential: StoredCredential | null;
   /** El viaje en curso, o `null` si no hay ninguno. */
@@ -32,6 +33,9 @@ export function useTripTracking(params: {
   const [isSharing, setSharing] = useState(false);
   /** Por qué no está subiendo el rastro. `null` = va bien. */
   const [lastUploadError, setLastUploadError] = useState<string | null>(null);
+  /** Un lote llegó bien: la oficina YA lo está viendo, diga lo que diga el
+   *  payload que quedó en pantalla (que puede ser anterior al envío). */
+  const [hasUploaded, setHasUploaded] = useState(false);
   const uploadingRef = useRef(false);
 
   const upload = useCallback(async () => {
@@ -43,6 +47,7 @@ export function useTripTracking(params: {
       if (lote.length === 0) return;
       await postPositions(credential, { tripId: activeTripId, points: lote });
       setLastUploadError(null);
+      setHasUploaded(true);
       // Se descuenta por ID y se relee el disco: mientras el lote viajaba el
       // servicio siguió escribiendo, y cortar por posición se los llevaría.
       writeBufferToDisk(dropSent(readBufferFromDisk(), lote));
@@ -104,5 +109,5 @@ export function useTripTracking(params: {
     return () => sub.remove();
   }, [activeTripId, isRunning]);
 
-  return { isSharing, upload, lastUploadError };
+  return { isSharing, upload, lastUploadError, hasUploaded };
 }

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -25,9 +27,10 @@ import type { StoredCredential } from '../auth/credential';
 import { theme } from '../ui/theme';
 import { STATUS_LABEL, formatTripDate, resolveTripFocus, type PortalTrip } from './focus';
 import { normalizePortalTrips } from './portalTrip';
-import { formatEta, trackingStatusLabel, type TripTracking } from './tracking';
+import { formatEta, resolveLocationWarning, trackingStatusLabel, type TripTracking } from './tracking';
 import { pendingLabel } from '../offline/queue';
 import { useOfflineQueue } from '../offline/useOfflineQueue';
+import * as Location from 'expo-location';
 import { getCurrentFix } from '../tracking/service';
 import { useTripTracking } from '../tracking/useTripTracking';
 
@@ -85,7 +88,19 @@ export const TripsScreen = ({
   const { pending, submit, lastFailure, clearFailure } = useOfflineQueue(credential);
   const enCurso = (payload?.trips ?? []).find((trip) => trip.status === 'en_curso') ?? null;
   const seguimiento = (payload as { tracking?: TripTracking } | null)?.tracking ?? null;
-  const { isSharing, lastUploadError } = useTripTracking({
+  /**
+   * Con «solo mientras uso la app» el rastreo se corta al bloquear la pantalla
+   * y el chofer no se entera hasta que la oficina lo llama. Se consulta el
+   * permiso REAL, no el que se pidió.
+   */
+  const [permisoFondo, setPermisoFondo] = useState(true);
+  useEffect(() => {
+    void Location.getBackgroundPermissionsAsync()
+      .then((estado) => setPermisoFondo(estado.granted))
+      .catch(() => setPermisoFondo(true));
+  }, [payload]);
+
+  const { isSharing, lastUploadError, hasUploaded } = useTripTracking({
     credential,
     activeTripId: enCurso?._id ?? null,
     isRunning: Boolean(enCurso),
@@ -222,7 +237,20 @@ export const TripsScreen = ({
       }
     >
       <Text style={styles.hello}>Hola, {payload?.driverName ?? 'conductor'}</Text>
-      <Text style={styles.company}>{payload?.companyName ?? ''}</Text>
+      {/* El logo de la empresa: el chofer tiene que ver DÓNDE trabaja al abrir
+          la app, no solo el nombre. Si no carga, queda el texto — nunca un
+          hueco ni un ícono roto. */}
+      <View style={styles.companyRow}>
+        {payload?.companyLogoUrl ? (
+          <Image
+            source={{ uri: payload.companyLogoUrl }}
+            style={styles.companyLogo}
+            resizeMode="contain"
+            accessibilityLabel={payload?.companyName ?? 'Empresa'}
+          />
+        ) : null}
+        <Text style={styles.company}>{payload?.companyName ?? ''}</Text>
+      </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -232,10 +260,23 @@ export const TripsScreen = ({
           S4: y además se le dice si de verdad ESTÁ LLEGANDO. Compartir y que la
           oficina no lo vea son dos cosas distintas, y hasta acá el chofer no
           tenía forma de notar la diferencia. */}
+      {resolveLocationWarning({ tripEnCurso: isSharing, backgroundGranted: permisoFondo }) ? (
+        <Pressable
+          style={styles.avisoPermiso}
+          onPress={() => void Linking.openSettings()}
+          testID="aviso-permiso-ubicacion"
+        >
+          <Text style={styles.avisoPermisoTexto}>
+            {resolveLocationWarning({ tripEnCurso: isSharing, backgroundGranted: permisoFondo })}
+          </Text>
+          <Text style={styles.avisoPermisoAccion}>Abrir Ajustes</Text>
+        </Pressable>
+      ) : null}
+
       {isSharing ? (
         <View style={styles.rastreo} testID="rastreo-activo">
           <Text style={styles.rastreoTitulo}>
-            {trackingStatusLabel(seguimiento) ?? 'Compartiendo tu ubicación'}
+            {trackingStatusLabel(seguimiento, hasUploaded) ?? 'Compartiendo tu ubicación'}
           </Text>
           <Text style={styles.rastreoDetalle}>
             {formatEta(seguimiento?.etaAt)
@@ -449,6 +490,20 @@ const styles = StyleSheet.create({
   page: { padding: 20, gap: 12, paddingBottom: 40 },
   hello: { fontSize: 26, fontWeight: '700', color: theme.text },
   company: { fontSize: 15, color: theme.textSecondary },
+  // Ámbar: es una advertencia, no un error — la app sigue funcionando.
+  avisoPermiso: {
+    backgroundColor: 'rgba(245,158,11,0.12)',
+    borderColor: 'rgba(245,158,11,0.5)',
+    borderRadius: 14,
+    borderWidth: 1,
+    gap: 6,
+    marginBottom: 12,
+    padding: 14,
+  },
+  avisoPermisoTexto: { color: theme.text, fontSize: 14, lineHeight: 20 },
+  avisoPermisoAccion: { color: theme.accent, fontSize: 15, fontWeight: '700' },
+  companyRow: { alignItems: 'center', flexDirection: 'row', gap: 8 },
+  companyLogo: { height: 28, width: 28 },
   rastreo: {
     backgroundColor: theme.surface,
     borderRadius: 12,
