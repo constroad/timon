@@ -1,10 +1,15 @@
 /**
  * El seguimiento del viaje, en palabras del chofer (Timón · S4). Motor PURO.
  *
- * El server manda tres datos crudos; acá se convierten en las dos frases que le
- * sirven. La importante es la segunda: **si la oficina lo está viendo**. Un
- * rastreo caído hoy se descubre cuando alguien llama a preguntar dónde va el
- * camión, y para entonces ya se perdió el tramo.
+ * El server manda tres datos crudos; acá se convierten en las frases que le
+ * sirven. La importante: **si el viaje se está registrando**. Un rastreo caído
+ * hoy se descubre cuando alguien llama a preguntar dónde va el camión, y para
+ * entonces ya se perdió el tramo.
+ *
+ * **Ningún texto nombra a quién mira.** El cartel decía «La oficina te está
+ * viendo» y eso no informa a un chofer que no entiende de GPS ni de permisos:
+ * lo asusta. Lo que necesita saber es si SU teléfono está registrando el viaje
+ * y, si no, qué tocar. Quién lo consulte después no es asunto de esta pantalla.
  */
 
 export interface TripTracking {
@@ -42,25 +47,8 @@ export function trackingStatusLabel(
   // La app sabe si acaba de mandar posiciones. El payload en pantalla puede ser
   // anterior a ese envío —nadie lo refresca al vuelo— y sin esto el cartel dice
   // «todavía no llega» con el rastro ya guardado en la oficina.
-  if (tracking.live || sentFromThisPhone) return 'La oficina te está viendo';
+  if (tracking.live || sentFromThisPhone) return 'Viaje registrándose';
   return tracking.lastPositionAt
-    ? 'Tu ubicación no llega hace rato. Revisa que esté prendida.'
-    : 'Tu ubicación todavía no llega a la oficina.';
-}
-
-/**
- * Aviso cuando el permiso de ubicación no alcanza para lo que el viaje necesita.
- *
- * Android ofrece «solo mientras uso la app» en el diálogo y **«todo el tiempo»
- * solo desde Ajustes**. Con el primero, el rastreo se corta al bloquear la
- * pantalla o cambiar de app — y el chofer no se entera hasta que la oficina lo
- * llama preguntando dónde va. Por eso se nombra el camino exacto, no un «revisa
- * los permisos».
- */
-export function resolveLocationWarning(params: {
-  tripEnCurso: boolean;
-  backgroundGranted: boolean;
-}): string | null {
-  if (!params.tripEnCurso || params.backgroundGranted) return null;
-  return 'Tu ubicación solo se comparte con la app abierta. Ponla en «Permitir todo el tiempo» desde Ajustes para que siga con la pantalla apagada.';
+    ? 'Tu ubicación no se registra hace rato. Revisa que esté prendida.'
+    : 'Todavía no se registra tu ubicación. Revisa que esté prendida.';
 }

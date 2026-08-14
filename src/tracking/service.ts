@@ -1,8 +1,10 @@
+import { Platform } from 'react-native';
 import * as Battery from 'expo-battery';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { addPoint, type BufferedPoint } from './buffer';
 import { resolveSampling, type SamplingConfig } from './policy';
+import { type PermissionState, type TrackingPlatform } from './permission';
 import { readBufferFromDisk, writeBufferToDisk } from './store';
 
 /**
@@ -31,7 +33,9 @@ export const LOCATION_TASK = 'timon-rastro-viaje';
  */
 const FOREGROUND_SERVICE = {
   notificationTitle: 'Timón · viaje en curso',
-  notificationBody: 'Compartiendo tu ubicación con la oficina',
+  // No nombra a la oficina: esta notificación es lo que el chofer tiene en la
+  // barra TODO el viaje, y ahí «te estamos viendo» se lee como una amenaza.
+  notificationBody: 'Registrando el recorrido del viaje',
   notificationColor: '#16A97A',
 };
 
@@ -49,14 +53,27 @@ TaskManager.defineTask(LOCATION_TASK, async ({ data, error }) => {
   writeBufferToDisk(buffer);
 });
 
-/** ¿Los permisos alcanzan para rastrear con la pantalla apagada? */
-export async function ensureBackgroundPermission(): Promise<boolean> {
+/**
+ * Pide los permisos y responde si alcanzan para rastrear con la pantalla
+ * apagada.
+ *
+ * **En Android alcanza con «mientras uso la app»**: el servicio en primer plano
+ * de arriba hace que el sistema considere la app en uso mientras corre. Pedir
+ * «todo el tiempo» igual vale la pena —es un permiso más—, pero **negarlo no
+ * puede bloquear el arranque**: así estaba y el resultado era que el chofer
+ * elegía la opción normal del diálogo y la app no rastreaba absolutamente nada.
+ *
+ * iOS sí necesita «Siempre»: ahí no hay servicio en primer plano que lo supla.
+ */
+export async function ensureTrackingPermission(): Promise<PermissionState> {
   const enUso = await Location.requestForegroundPermissionsAsync();
-  if (!enUso.granted) return false;
-  // iOS concede «Siempre» recién después, y a veces días más tarde (§4.7-2):
-  // que lo niegue no puede romper el arranque, solo degrada a primer plano.
-  const siempre = await Location.requestBackgroundPermissionsAsync();
-  return siempre.granted;
+  const platform: TrackingPlatform = Platform.OS === 'ios' ? 'ios' : 'android';
+  if (!enUso.granted) {
+    return { platform, foregroundGranted: false, backgroundGranted: false };
+  }
+  // iOS concede «Siempre» recién después, y a veces días más tarde (§4.7-2).
+  const siempre = await Location.requestBackgroundPermissionsAsync().catch(() => null);
+  return { platform, foregroundGranted: true, backgroundGranted: siempre?.granted === true };
 }
 
 /**
@@ -121,9 +138,13 @@ function conTope(
   });
 }
 
+/**
+ * Arranca el rastreo. Devuelve `false` SOLO si de verdad no se puede rastrear
+ * (sin permiso de ubicación), no si falta el permiso «todo el tiempo».
+ */
 export async function startTracking(config?: SamplingConfig): Promise<boolean> {
-  const permitido = await ensureBackgroundPermission();
-  if (!permitido) return false;
+  const permisos = await ensureTrackingPermission();
+  if (!permisos.foregroundGranted) return false;
   if (await isTracking()) return true;
 
   const bateria = await batteryLevelSafe();
@@ -133,20 +154,26 @@ export async function startTracking(config?: SamplingConfig): Promise<boolean> {
     config,
   });
 
-  await Location.startLocationUpdatesAsync(LOCATION_TASK, {
-    // `High` se alimenta del GPS. `Balanced` usa wifi y antenas de celular, que
-    // en la carretera no existen: ahí su «precisión» son kilómetros. Para un
-    // camión entre ciudades el GPS no es un lujo, es la única fuente real.
-    accuracy: Location.Accuracy.High,
-    timeInterval: intervalMs,
-    distanceInterval: distanceM,
-    // Doze agrupa despertares (§4.4-2): esto pide que los entregue igual, aun
-    // en ráfagas, en vez de perderlos.
-    deferredUpdatesInterval: intervalMs,
-    pausesUpdatesAutomatically: false,
-    showsBackgroundLocationIndicator: true,
-    foregroundService: FOREGROUND_SERVICE,
-  });
+  // iOS sin «Siempre» rechaza el arranque en segundo plano. No puede tumbar la
+  // pantalla: se reporta que no arrancó y el aviso de permisos explica por qué.
+  try {
+    await Location.startLocationUpdatesAsync(LOCATION_TASK, {
+      // `High` se alimenta del GPS. `Balanced` usa wifi y antenas de celular, que
+      // en la carretera no existen: ahí su «precisión» son kilómetros. Para un
+      // camión entre ciudades el GPS no es un lujo, es la única fuente real.
+      accuracy: Location.Accuracy.High,
+      timeInterval: intervalMs,
+      distanceInterval: distanceM,
+      // Doze agrupa despertares (§4.4-2): esto pide que los entregue igual, aun
+      // en ráfagas, en vez de perderlos.
+      deferredUpdatesInterval: intervalMs,
+      pausesUpdatesAutomatically: false,
+      showsBackgroundLocationIndicator: true,
+      foregroundService: FOREGROUND_SERVICE,
+    });
+  } catch {
+    return false;
+  }
   return true;
 }
 

@@ -1,4 +1,4 @@
-import { formatEta, resolveLocationWarning, trackingStatusLabel } from './tracking';
+import { formatEta, trackingStatusLabel } from './tracking';
 
 /**
  * Lo que el chofer lee sobre su propio rastreo. La regla: cuando algo está mal,
@@ -17,8 +17,17 @@ describe('formatEta', () => {
 });
 
 describe('trackingStatusLabel', () => {
-  it('en vivo, se lo dice', () => {
-    expect(trackingStatusLabel({ live: true, progressPct: 40 })).toBe('La oficina te está viendo');
+  /**
+   * NUNCA se nombra a quién lo mira. El texto viejo decía «La oficina te está
+   * viendo» y, en boca de un chofer de 60 años que no entiende de permisos ni
+   * de GPS, eso no informa: asusta. Lo que le sirve saber es si la app está
+   * registrando el viaje — un dato sobre SU teléfono, no sobre quién lo vigila.
+   */
+  it('en vivo, habla del registro del viaje y NO de la oficina', () => {
+    const texto = trackingStatusLabel({ live: true, progressPct: 40 });
+
+    expect(texto).toBe('Viaje registrándose');
+    expect(texto).not.toMatch(/oficina|viendo|vigil|control/i);
   });
 
   /** «Sin señal» a secas lo deja mirando el teléfono sin saber qué tocar. */
@@ -28,11 +37,16 @@ describe('trackingStatusLabel', () => {
       progressPct: 40,
       lastPositionAt: '2026-08-10T18:00:00.000Z',
     });
+
     expect(texto).toContain('prendida');
+    expect(texto).not.toMatch(/oficina|viendo|vigil|control/i);
   });
 
-  it('si nunca llegó ninguna posición, lo dice distinto', () => {
-    expect(trackingStatusLabel({ live: false, progressPct: 0 })).toContain('todavía no llega');
+  it('si nunca llegó ninguna posición, lo dice sin nombrar a la oficina', () => {
+    const texto = trackingStatusLabel({ live: false, progressPct: 0 });
+
+    expect(texto).toContain('ubicación');
+    expect(texto).not.toMatch(/oficina|viendo|vigil|control/i);
   });
 
   it('sin seguimiento no dice nada', () => {
@@ -43,40 +57,15 @@ describe('trackingStatusLabel', () => {
 describe('trackingStatusLabel — con lo que la app ya envió', () => {
   /**
    * El caso real (13/08/2026): la app mandó la primera posición y el cartel
-   * seguía diciendo «todavía no llega a la oficina», porque el payload en
-   * pantalla era anterior al envío y nadie lo refresca. La app SABE que envió:
-   * decir lo contrario es mentirle al chofer sobre su propio rastreo.
+   * seguía diciendo que no llegaba nada, porque el payload en pantalla era
+   * anterior al envío y nadie lo refresca. La app SABE que envió: decir lo
+   * contrario es mentirle al chofer sobre su propio rastreo.
    */
-  it('si la app acaba de enviar, la oficina lo está viendo', () => {
-    expect(trackingStatusLabel({ live: false, progressPct: 0 }, true)).toBe(
-      'La oficina te está viendo'
-    );
+  it('si la app acaba de enviar, el viaje se está registrando', () => {
+    expect(trackingStatusLabel({ live: false, progressPct: 0 }, true)).toBe('Viaje registrándose');
   });
 
   it('sin envío propio, manda lo que dice el server', () => {
-    expect(trackingStatusLabel({ live: false, progressPct: 0 }, false)).toBe(
-      'Tu ubicación todavía no llega a la oficina.'
-    );
-  });
-});
-
-describe('resolveLocationWarning', () => {
-  /**
-   * Lo grave: con «solo mientras uso la app», el rastreo se corta al bloquear
-   * la pantalla y el chofer no se entera hasta que la oficina lo llama.
-   */
-  it('viaje en curso sin permiso de fondo: se avisa y se dice qué hacer', () => {
-    const aviso = resolveLocationWarning({ tripEnCurso: true, backgroundGranted: false });
-
-    expect(aviso).toContain('Ajustes');
-    expect(aviso).toContain('todo el tiempo');
-  });
-
-  it('con el permiso correcto, no molesta', () => {
-    expect(resolveLocationWarning({ tripEnCurso: true, backgroundGranted: true })).toBeNull();
-  });
-
-  it('sin viaje en curso tampoco molesta: todavía no hace falta', () => {
-    expect(resolveLocationWarning({ tripEnCurso: false, backgroundGranted: false })).toBeNull();
+    expect(trackingStatusLabel({ live: false, progressPct: 0 }, false)).toContain('ubicación');
   });
 });

@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Image,
   Linking,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -27,7 +28,8 @@ import type { StoredCredential } from '../auth/credential';
 import { theme } from '../ui/theme';
 import { STATUS_LABEL, formatTripDate, resolveTripFocus, type PortalTrip } from './focus';
 import { normalizePortalTrips } from './portalTrip';
-import { formatEta, resolveLocationWarning, trackingStatusLabel, type TripTracking } from './tracking';
+import { resolvePermissionWarning, type PermissionState } from '../tracking/permission';
+import { formatEta, trackingStatusLabel, type TripTracking } from './tracking';
 import { pendingLabel } from '../offline/queue';
 import { useOfflineQueue } from '../offline/useOfflineQueue';
 import * as Location from 'expo-location';
@@ -89,22 +91,35 @@ export const TripsScreen = ({
   const enCurso = (payload?.trips ?? []).find((trip) => trip.status === 'en_curso') ?? null;
   const seguimiento = (payload as { tracking?: TripTracking } | null)?.tracking ?? null;
   /**
-   * Con «solo mientras uso la app» el rastreo se corta al bloquear la pantalla
-   * y el chofer no se entera hasta que la oficina lo llama. Se consulta el
-   * permiso REAL, no el que se pidió.
+   * Se consulta el permiso REAL, no el que se pidió. En Android «mientras uso
+   * la app» ALCANZA (el servicio en primer plano lo cubre): el aviso solo sale
+   * cuando el rastreo de verdad no puede funcionar — ver `tracking/permission`.
    */
-  const [permisoFondo, setPermisoFondo] = useState(true);
+  const [permisos, setPermisos] = useState<PermissionState>({
+    platform: Platform.OS === 'ios' ? 'ios' : 'android',
+    foregroundGranted: true,
+    backgroundGranted: true,
+  });
   useEffect(() => {
-    void Location.getBackgroundPermissionsAsync()
-      .then((estado) => setPermisoFondo(estado.granted))
-      .catch(() => setPermisoFondo(true));
+    void Promise.all([
+      Location.getForegroundPermissionsAsync(),
+      Location.getBackgroundPermissionsAsync().catch(() => ({ granted: false })),
+    ])
+      .then(([enUso, siempre]) =>
+        setPermisos({
+          platform: Platform.OS === 'ios' ? 'ios' : 'android',
+          foregroundGranted: enUso.granted,
+          backgroundGranted: siempre.granted,
+        })
+      )
+      .catch(() => undefined);
   }, [payload]);
-
   const { isSharing, lastUploadError, hasUploaded } = useTripTracking({
     credential,
     activeTripId: enCurso?._id ?? null,
     isRunning: Boolean(enCurso),
   });
+  const avisoPermiso = resolvePermissionWarning({ ...permisos, tripEnCurso: isSharing });
 
   const load = useCallback(async () => {
     try {
@@ -237,20 +252,12 @@ export const TripsScreen = ({
       }
     >
       <Text style={styles.hello}>Hola, {payload?.driverName ?? 'conductor'}</Text>
-      {/* El logo de la empresa: el chofer tiene que ver DÓNDE trabaja al abrir
-          la app, no solo el nombre. Si no carga, queda el texto — nunca un
-          hueco ni un ícono roto. */}
-      <View style={styles.companyRow}>
-        {payload?.companyLogoUrl ? (
-          <Image
-            source={{ uri: payload.companyLogoUrl }}
-            style={styles.companyLogo}
-            resizeMode="contain"
-            accessibilityLabel={payload?.companyName ?? 'Empresa'}
-          />
-        ) : null}
-        <Text style={styles.company}>{payload?.companyName ?? ''}</Text>
-      </View>
+      {/* Solo el NOMBRE: el logo ya vive en la cabecera. Acá había un `<Image>`
+          con la misma URL que nunca dibujó nada — el logo de la empresa es un
+          SVG y `<Image>` de React Native no los renderiza (no falla, no dibuja).
+          Repetirlo bien tampoco servía: el mismo logo dos veces en una pantalla
+          de 6 pulgadas es ruido. */}
+      <Text style={styles.company}>{payload?.companyName ?? ''}</Text>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -260,14 +267,14 @@ export const TripsScreen = ({
           S4: y además se le dice si de verdad ESTÁ LLEGANDO. Compartir y que la
           oficina no lo vea son dos cosas distintas, y hasta acá el chofer no
           tenía forma de notar la diferencia. */}
-      {resolveLocationWarning({ tripEnCurso: isSharing, backgroundGranted: permisoFondo }) ? (
+      {avisoPermiso ? (
         <Pressable
           style={styles.avisoPermiso}
           onPress={() => void Linking.openSettings()}
           testID="aviso-permiso-ubicacion"
         >
           <Text style={styles.avisoPermisoTexto}>
-            {resolveLocationWarning({ tripEnCurso: isSharing, backgroundGranted: permisoFondo })}
+            {avisoPermiso}
           </Text>
           <Text style={styles.avisoPermisoAccion}>Abrir Ajustes</Text>
         </Pressable>
@@ -276,7 +283,7 @@ export const TripsScreen = ({
       {isSharing ? (
         <View style={styles.rastreo} testID="rastreo-activo">
           <Text style={styles.rastreoTitulo}>
-            {trackingStatusLabel(seguimiento, hasUploaded) ?? 'Compartiendo tu ubicación'}
+            {trackingStatusLabel(seguimiento, hasUploaded) ?? 'Viaje registrándose'}
           </Text>
           <Text style={styles.rastreoDetalle}>
             {formatEta(seguimiento?.etaAt)
@@ -502,8 +509,6 @@ const styles = StyleSheet.create({
   },
   avisoPermisoTexto: { color: theme.text, fontSize: 14, lineHeight: 20 },
   avisoPermisoAccion: { color: theme.accent, fontSize: 15, fontWeight: '700' },
-  companyRow: { alignItems: 'center', flexDirection: 'row', gap: 8 },
-  companyLogo: { height: 28, width: 28 },
   rastreo: {
     backgroundColor: theme.surface,
     borderRadius: 12,

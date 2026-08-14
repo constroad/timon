@@ -40,9 +40,12 @@ appId: com.constroad.timon
 # El «Continuar» de arriba pidió un código REAL al servidor, aleatorio. Acá se
 # re-sella con uno conocido: sembrarlo antes no sirve, porque ese pedido lo
 # habría superado y el flujo se invalidaría a sí mismo.
-- runScript: sellarOtp.js
-
+#
+# Y se sella DESPUÉS de ver la pantalla del código, no antes: mientras el pedido
+# real sigue en vuelo, sellar no sirve —la respuesta que llega después pisa el
+# código sembrado y el flujo muere con «Ese código no es correcto».
 - assertVisible: "Escribe el código"
+- runScript: sellarOtp.js
 - tapOn:
     id: "input-otp"
 - inputText: "123456"
