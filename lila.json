@@ -1,0 +1,7 @@
+{
+  "build": {
+    "env": {
+      "EXPO_PUBLIC_API_URL": "https://www.constroad.com"
+    }
+  }
+}
