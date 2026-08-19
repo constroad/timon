@@ -40,6 +40,13 @@ ABI=arm64-v8a
 # lleve esa URL se instala igual y falla en la mano del chofer con «sin
 # conexión» — con el wifi perfecto. Pasó con la 0.2.2.
 API_URL=https://www.constroad.com
+# A qué lila se SUBE el APK. Se fija acá por lo mismo que `API_URL`, y con un
+# riesgo peor: el `.env` de Portal apunta a `localhost:3001` en desarrollo, y el
+# host de Tailscale —que sigue vivo y sirve el mismo lila— publica sin fallar.
+# En los dos casos la subida sale bien y lo que queda mal es la URL guardada:
+# el chofer ve la pantalla de «actualizá» con un enlace que su teléfono no
+# resuelve. Por eso se ASIGNA, no se hereda del entorno.
+LILA_URL=https://lila.constroad.com/api
 # Fijar la versión mínima al publicar es lo que hace que la app AVISE al chofer
 # que tiene que actualizar: es el único mecanismo que hay (no existe un «hay una
 # nueva» opcional). Deja fuera a los teléfonos por debajo, pero la pantalla de
@@ -56,6 +63,7 @@ for arg in "$@"; do
     --firma=*) FIRMA="${arg#*=}" ;;
     --abi=*) ABI="${arg#*=}" ;;
     --api=*) API_URL="${arg#*=}" ;;
+    --lila=*) LILA_URL="${arg#*=}" ;;
     --sin-obligar) OBLIGAR=0 ;;
     *) echo "Opción desconocida: $arg"; exit 1 ;;
   esac
@@ -75,8 +83,53 @@ ok() { printf '\033[32m✓\033[0m %s \033[2m(%ss)\033[0m\n' "$1" "$(( $(date +%s
 aviso() { printf '  \033[33m!\033[0m %s\n' "$1"; }
 mb() { echo "$(( $1 / 1048576 )).$(( ($1 % 1048576) * 10 / 1048576 )) MB"; }
 
+# ¿Esta URL le sirve al teléfono de un chofer? El paso 6 deja fuera a toda la
+# flota, así que una URL que solo existe en la Tailnet o en esta Mac convierte
+# ese bloqueo en camiones parados sin salida. Se comprueba lo que de verdad
+# quedó guardado, igual que la URL embebida en el bundle: no se asume.
+url_publica() {
+  local url="$1" host
+  [[ "$url" =~ ^https:// ]] || return 1
+  host=$(printf '%s' "$url" | sed -E 's#^https://([^/:]+).*#\1#' | tr '[:upper:]' '[:lower:]')
+  case "$host" in
+    *.ts.net|localhost|*.local|*.internal) return 1 ;;
+    127.*|10.*|192.168.*|169.254.*) return 1 ;;
+    172.1[6-9].*|172.2[0-9].*|172.3[01].*) return 1 ;;
+  esac
+  return 0
+}
+
+# ── JDK ─────────────────────────────────────────────────────────────────────
+# **Gradle va con JDK 17. Con el 21+ el build muere en CMake**, con un mensaje
+# que no nombra a Java:
+#
+#   Execution failed for task ':app:configureCMakeRelWithDebInfo[arm64-v8a]'
+#   > WARNING: A restricted method in java.lang.System has been called
+#
+# Es la restricción de acceso nativo que trajo JDK 24 (JEP 472) y que dispara la
+# tarea del NDK. Pasó el 18/08/2026 sin que nadie tocara el build: Android Studio
+# actualizó su JBR a 25, y quien tuviera `JAVA_HOME` apuntando ahí se quedó sin
+# compilar. Por eso se ELIGE el JDK acá y no se hereda del entorno — mismo
+# criterio que `API_URL` y `LILA_URL`.
+JDK17=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+version_jdk() { "$1/bin/java" -version 2>&1 | head -1 | sed -E 's/.*"([0-9]+).*/\1/'; }
+
+if [ -x "$JDK17/bin/java" ]; then
+  export JAVA_HOME="$JDK17"
+elif [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/java" ] && [ "$(version_jdk "$JAVA_HOME")" = "17" ]; then
+  : # el del entorno ya es 17
+else
+  printf '\033[31m✗\033[0m Falta el JDK 17, que es con el que compila Gradle.\n\n'
+  printf 'Instalalo:\n  brew install openjdk@17\n\n'
+  printf 'El JDK que trae Android Studio (hoy 25) NO sirve: el build muere en\n'
+  printf 'CMake con «A restricted method in java.lang.System has been called».\n'
+  exit 1
+fi
+export PATH="$JAVA_HOME/bin:$PATH"
+
 printf '\n\033[1mTimón · release\033[0m  \033[2m(%s · %s · %s)\033[0m\n' "$COMPANY" "$ABI" "$API_URL"
 printf '─────────────────────────────────────────────\n'
+printf '\033[2mJDK %s · %s\033[0m\n' "$(version_jdk "$JAVA_HOME")" "$JAVA_HOME"
 
 # ── 1. Firma ────────────────────────────────────────────────────────────────
 paso 1 "Firma"
@@ -177,13 +230,19 @@ if [ "$PUBLICAR" = "0" ]; then
   printf '\033[2m— omitido (--solo-compilar)\033[0m\n'
   URL=""
 else
-  : "${NEXT_PUBLIC_LILA_SERVER_URL:=https://cloud-constroad-s3.tail46a1b0.ts.net/api}"
-  export NEXT_PUBLIC_LILA_SERVER_URL
+  export NEXT_PUBLIC_LILA_SERVER_URL="$LILA_URL"
   SALIDA=$( cd /Users/josezamora/projects/Portal \
     && npx tsx --env-file=.env scripts/publish-timon-apk.ts \
          "/Users/josezamora/projects/timon/$DESTINO" "$COMPANY" "$CARPETA" 2>/dev/null | tail -1 )
   URL=$(node -p "JSON.parse(process.argv[1]).downloadUrl" "$SALIDA" 2>/dev/null || echo '')
   [ -z "$URL" ] && { printf '\033[31m✗ no se pudo publicar\033[0m\n%s\n' "$SALIDA"; exit 1; }
+  # Antes del paso 6: si la URL no sirve, se corta acá y NADIE queda bloqueado.
+  if ! url_publica "$URL"; then
+    printf '\033[31m✗ la URL publicada no le sirve a un teléfono:\033[0m %s\n' "$URL"
+    printf '  Revisá LILA_URL (--lila=%s).\n' "$LILA_URL"
+    printf '  No se fijó la versión mínima: la flota sigue trabajando con la anterior.\n'
+    exit 1
+  fi
   ok "Drive › $CARPETA"
 fi
 
