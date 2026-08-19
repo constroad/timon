@@ -1,0 +1,115 @@
+name: Release
+
+# **Publicar es un acto explícito, no una consecuencia de mergear.** Un push a
+# `main` no puede mandarle una versión nueva a treinta teléfonos: se etiqueta.
+#
+#   git tag v0.5.0 && git push origin v0.5.0     → compila y publica en stable
+#   (o «Run workflow» desde Actions, eligiendo el canal)
+#
+# El `versionCode` sale de `app.json` y tiene que haberse subido ANTES del tag:
+# si ya está publicado, LilaStore responde 409 `version_no_avanza` y el workflow
+# falla. Es la guarda funcionando, no un error del CI.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      canal:
+        description: 'A qué canal publicar'
+        type: choice
+        default: beta
+        options: [beta, stable]
+
+# Dos releases a la vez es una carrera por el `versionCode`: la segunda pierde
+# quince minutos de Gradle para chocar contra el 409.
+concurrency:
+  group: release-timon
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # **JDK 17, no el que venga.** Con el 21+ Gradle muere en CMake con «A
+      # restricted method in java.lang.System has been called» (JEP 472). Pasó el
+      # 18/08/2026 en la Mac sin que nadie tocara el build: Android Studio
+      # actualizó su JBR a 25.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: npm ci
+
+      # La keystore se materializa desde un secret y **se borra al terminar**
+      # (ver el último paso). Sin esto Gradle firma con debug, y un APK de debug
+      # se instala encima del de debug y parece que todo anda — hasta el día que
+      # se pasa a la firma real y hay que desinstalar en cada teléfono.
+      #
+      # Va en ~/.gradle/gradle.properties y no en el repo porque `android/` lo
+      # regenera `expo prebuild` en cada corrida.
+      - name: Preparar la firma
+        env:
+          KEYSTORE_B64: ${{ secrets.TIMON_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.TIMON_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [ -n "${KEYSTORE_B64:-}" ] || { echo "::error::Falta el secret TIMON_KEYSTORE_B64"; exit 1; }
+          [ -n "${KEYSTORE_PASSWORD:-}" ] || { echo "::error::Falta el secret TIMON_KEYSTORE_PASSWORD"; exit 1; }
+          mkdir -p ~/.gradle
+          echo "$KEYSTORE_B64" | base64 -d > ~/.gradle/timon-release.jks
+          chmod 600 ~/.gradle/timon-release.jks
+          cat >> ~/.gradle/gradle.properties <<EOF
+          TIMON_UPLOAD_STORE_FILE=$HOME/.gradle/timon-release.jks
+          TIMON_UPLOAD_KEY_ALIAS=timon
+          TIMON_UPLOAD_STORE_PASSWORD=$KEYSTORE_PASSWORD
+          TIMON_UPLOAD_KEY_PASSWORD=$KEYSTORE_PASSWORD
+          EOF
+          chmod 600 ~/.gradle/gradle.properties
+
+      # `lila apk build` resuelve el JDK y el SDK por su cuenta, verifica que la
+      # firma NO sea la de debug, y comprueba que la URL de release declarada en
+      # `lila.json` haya quedado ADENTRO del binario. Esa última no es opcional:
+      # un APK compilado con el .env de desarrollo se instala perfecto y falla en
+      # la mano del chofer con «sin conexión» y el wifi funcionando.
+      - name: Compilar y firmar
+        run: npx @constroad/lila-cli@0.2.0 apk build
+
+      # El artefacto ANTES de publicar: si la subida falla —y no hay reintento ni
+      # reanudación— se republica sin volver a compilar quince minutos.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: dist/*.apk
+          retention-days: 7
+
+      # El token ES la app: el server saca el `appId` del token y no acepta que
+      # le digan a cuál subir. Un repo, un secret, una app.
+      - name: Publicar en LilaStore
+        env:
+          LILASTORE_TOKEN: ${{ secrets.LILASTORE_TOKEN }}
+          # Por `env` y no interpolado dentro del `run`. Acá el valor es un
+          # `choice` acotado, pero un `${{ }}` pegado en medio de un script es la
+          # forma clásica de inyección en Actions, y no conviene que el patrón
+          # exista en un workflow que tiene la keystore y el token en el entorno.
+          # Sin disparo manual, `inputs.canal` viene vacío y queda `stable`.
+          CANAL: ${{ inputs.canal || 'stable' }}
+        run: |
+          set -euo pipefail
+          [ -n "${LILASTORE_TOKEN:-}" ] || { echo "::error::Falta el secret LILASTORE_TOKEN"; exit 1; }
+          echo "Publicando en $CANAL"
+          npx @constroad/lila-cli@0.2.0 apk publish --channel="$CANAL"
+
+      # `if: always()`: si algo falló a mitad, la keystore no puede quedar en el
+      # disco del runner. El runner es efímero, pero no hace falta confiar en eso
+      # para la credencial más irreemplazable del proyecto.
+      - name: Borrar la firma
+        if: always()
+        run: rm -f ~/.gradle/timon-release.jks ~/.gradle/gradle.properties
