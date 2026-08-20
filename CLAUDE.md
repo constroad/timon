@@ -31,6 +31,27 @@ hay backend propio. Los archivos (fotos, PDFs) viven en **lila-app**.
 - Todo request se re-scopea por `companyId` **en el server**, nunca por lo que
   mande el cliente.
 
+**Se reparte por LilaStore, no por el Google Drive (19/08/2026).** Antes el APK
+se subía al Drive de la empresa con un script de Portal y la versión mínima se
+escribía en `systemSettings` con otro. Dos caminos con dos formas de fallar por
+separado, y el hueco entre ellos —APK nuevo arriba, mínimo apuntando a la
+anterior— dejaba a los choferes sin enterarse. Hoy:
+
+- `npm run release` publica con `lila apk publish --obligar`: subir y fijar la
+  mínima son **un solo acto**, con el mismo token y contra el mismo server que
+  guarda el binario.
+- `fetchMinVersion()` pregunta a `GET /api/v1/apps/timon/min-version` de
+  LilaStore. `/api/public/app/version` de Portal quedó **solo para los APK ya
+  instalados** que todavía apuntan ahí, y ya no se actualiza.
+- La URL de la tienda se **fija** en `client.ts` y en `lila.json`, nunca se
+  hereda del entorno — el mismo motivo que `EXPO_PUBLIC_API_URL`.
+- **`downloadUrl` viene vacía mientras Timón esté marcada privada** en LilaStore:
+  `/d/:releaseId` solo sirve sin credencial a las apps públicas. Con la URL vacía
+  la pantalla de bloqueo avisa igual, pero pierde el botón que baja el APK ahí
+  mismo; hay que actualizar desde LilaStore. El enlace del Drive daba esa misma
+  exposición pública, así que marcarla pública no es un paso atrás — pero es una
+  decisión de José, no un default.
+
 ## Invariantes que NO se negocian
 
 1. **La empresa la declara la persona.** El alta empieza por el código de

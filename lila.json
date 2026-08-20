@@ -1,7 +1,8 @@
 {
   "build": {
     "env": {
-      "EXPO_PUBLIC_API_URL": "https://www.constroad.com"
+      "EXPO_PUBLIC_API_URL": "https://www.constroad.com",
+      "EXPO_PUBLIC_STORE_URL": "https://lilastore.constroad.com"
     }
   }
 }

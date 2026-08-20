@@ -13,6 +13,22 @@ import type { ChecklistAnswer, ChecklistItem } from '../trips/checklist';
 
 const BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'https://www.constroad.com').replace(/\/+$/, '');
 
+/**
+ * LilaStore: de dónde sale la versión mínima y el APK.
+ *
+ * **Se fija acá y no se hereda del `.env`**, por la misma razón que `API_URL` en
+ * `scripts/build-apk.sh`: un release compilado con el entorno de desarrollo
+ * apuntaría al emulador, se instalaría perfecto y fallaría en la mano del chofer
+ * con el wifi andando. El override existe solo para probar contra una LilaStore
+ * local.
+ */
+const STORE_URL = (
+  process.env.EXPO_PUBLIC_STORE_URL ?? 'https://lilastore.constroad.com'
+).replace(/\/+$/, '');
+
+/** Cómo se llama esta app EN LilaStore. Es la clave de la ruta, no un rótulo. */
+const SLUG = 'timon';
+
 /** Cota de paciencia. Más allá de esto el chofer ya volvió a tocar el botón. */
 const TIMEOUT_MS = 12_000;
 
@@ -312,12 +328,26 @@ export async function postAttendanceMark(
 /**
  * Versión mínima soportada (A7). Sin autenticar: el bloqueo tiene que poder
  * mostrarse ANTES del alta. Si falla, devuelve vacío — no saber no bloquea.
+ *
+ * **Desde el 19/08/2026 pregunta a LilaStore, no a Portal.** Era la otra mitad
+ * del camino del Google Drive: el APK se subía al Drive y el mínimo se escribía
+ * en `systemSettings` de Portal con un script. Ahora las dos cosas las hace
+ * `lila apk publish --obligar`, en un solo acto y contra el mismo server que
+ * guarda el binario — el estado intermedio (APK nuevo, mínimo viejo) deja de
+ * poder existir.
+ *
+ * `downloadUrl` viene **vacía si Timón está marcada como privada** en LilaStore:
+ * `/d/<release>` solo sirve sin credencial a las apps públicas. Con la URL
+ * vacía la pantalla de bloqueo sigue avisando, pero sin el botón que baja el APK
+ * ahí mismo — hay que actualizar desde LilaStore.
  */
 export async function fetchMinVersion(): Promise<{ minVersion: string; downloadUrl: string }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const response = await fetch(`${BASE_URL}/api/public/app/version`, { signal: controller.signal });
+    const response = await fetch(`${STORE_URL}/api/v1/apps/${SLUG}/min-version`, {
+      signal: controller.signal,
+    });
     const payload = (await response.json().catch(() => ({}))) as {
       minVersion?: string;
       downloadUrl?: string;

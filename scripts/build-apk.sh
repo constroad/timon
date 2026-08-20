@@ -1,15 +1,25 @@
 #!/usr/bin/env bash
-# APK de Timón: generar, firmar y publicar en el Drive de la empresa (A7 §6-4).
+# APK de Timón: generar, firmar y publicar en LilaStore.
 #
-#   npm run release                       # compila y publica en el Drive
+#   npm run release                       # compila y publica en LilaStore
 #   npm run release -- --bump=minor       # sube la versión antes de compilar
 #   npm run release -- --solo-compilar    # sin publicar
 #   npm run release -- --abi=all          # las 4 arquitecturas (teléfonos viejos)
 #   npm run release -- --firma=release    # exige la keystore propia
 #   npm run release -- --sin-obligar      # publica SIN pedirles que actualicen
 #
-# «Publicar» acá es **subir el APK al Drive de la empresa** y dejar la URL lista
-# para la pantalla de actualización de la app. Nada que ver con Play Store.
+# «Publicar» es **subir el APK a LilaStore**, la tienda interna. Nada que ver
+# con Play Store.
+#
+# **El 19/08/2026 dejó de publicar en el Google Drive.** Antes esto hacía dos
+# cosas por caminos distintos: subía el APK al Drive con un script de Portal, y
+# después escribía la versión mínima en `systemSettings` de Portal con otro. Eran
+# dos pasos con dos formas de fallar por separado, y el hueco entre ellos —APK
+# nuevo arriba, mínimo apuntando a la anterior— dejaba a la flota sin enterarse.
+# Ahora es un solo comando contra el server que guarda el binario:
+# `lila apk publish --obligar`.
+#
+# Hace falta un token de publicación: `lila login` una vez, o `LILASTORE_TOKEN`.
 #
 # La keystore la genera y la guarda JOSÉ: lleva contraseña y perderla obliga a
 # desinstalar y reinstalar en TODOS los teléfonos. Por eso no vive en el repo ni
@@ -25,8 +35,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PUBLICAR=1
-COMPANY=constroad
-CARPETA="App Timón"
 BUMP=""
 # `debug` por defecto porque es la firma con la que ya están los teléfonos: pasar
 # a `release` sin migrar obliga a desinstalar en cada uno (Android no deja
@@ -40,13 +48,15 @@ ABI=arm64-v8a
 # lleve esa URL se instala igual y falla en la mano del chofer con «sin
 # conexión» — con el wifi perfecto. Pasó con la 0.2.2.
 API_URL=https://www.constroad.com
-# A qué lila se SUBE el APK. Se fija acá por lo mismo que `API_URL`, y con un
-# riesgo peor: el `.env` de Portal apunta a `localhost:3001` en desarrollo, y el
-# host de Tailscale —que sigue vivo y sirve el mismo lila— publica sin fallar.
-# En los dos casos la subida sale bien y lo que queda mal es la URL guardada:
-# el chofer ve la pantalla de «actualizá» con un enlace que su teléfono no
-# resuelve. Por eso se ASIGNA, no se hereda del entorno.
-LILA_URL=https://lila.constroad.com/api
+# A qué LilaStore se sube, y a cuál le pregunta la app por su versión mínima.
+# **Tienen que ser la misma**, y por eso es una sola variable: publicar en una y
+# preguntarle a otra deja al chofer con la pantalla de «actualizá» apuntando a un
+# archivo que no existe.
+#
+# Se fija acá por lo mismo que `API_URL`: heredarla del entorno es cómo un
+# release termina apuntando al emulador y falla en la mano del chofer con el wifi
+# perfecto.
+STORE_URL=https://lilastore.constroad.com
 # Fijar la versión mínima al publicar es lo que hace que la app AVISE al chofer
 # que tiene que actualizar: es el único mecanismo que hay (no existe un «hay una
 # nueva» opcional). Deja fuera a los teléfonos por debajo, pero la pantalla de
@@ -57,13 +67,11 @@ for arg in "$@"; do
   case "$arg" in
     --solo-compilar) PUBLICAR=0 ;;
     --publicar) PUBLICAR=1 ;;
-    --company=*) COMPANY="${arg#*=}" ;;
-    --carpeta=*) CARPETA="${arg#*=}" ;;
     --bump=*) BUMP="${arg#*=}" ;;
     --firma=*) FIRMA="${arg#*=}" ;;
     --abi=*) ABI="${arg#*=}" ;;
     --api=*) API_URL="${arg#*=}" ;;
-    --lila=*) LILA_URL="${arg#*=}" ;;
+    --tienda=*) STORE_URL="${arg#*=}" ;;
     --sin-obligar) OBLIGAR=0 ;;
     *) echo "Opción desconocida: $arg"; exit 1 ;;
   esac
@@ -73,7 +81,7 @@ done
 # ── Presentación ────────────────────────────────────────────────────────────
 # Cada paso se anuncia ANTES de tardar, no después: un `assembleRelease` son dos
 # minutos de silencio y sin esto parece colgado.
-TOTAL=6
+TOTAL=5
 INICIO_PASO=0
 paso() {
   INICIO_PASO=$(date +%s)
@@ -83,10 +91,9 @@ ok() { printf '\033[32m✓\033[0m %s \033[2m(%ss)\033[0m\n' "$1" "$(( $(date +%s
 aviso() { printf '  \033[33m!\033[0m %s\n' "$1"; }
 mb() { echo "$(( $1 / 1048576 )).$(( ($1 % 1048576) * 10 / 1048576 )) MB"; }
 
-# ¿Esta URL le sirve al teléfono de un chofer? El paso 6 deja fuera a toda la
-# flota, así que una URL que solo existe en la Tailnet o en esta Mac convierte
-# ese bloqueo en camiones parados sin salida. Se comprueba lo que de verdad
-# quedó guardado, igual que la URL embebida en el bundle: no se asume.
+# ¿Esta URL le sirve al teléfono de un chofer? Publicar obligando deja fuera a
+# toda la flota, así que una tienda que solo existe en la Tailnet o en esta Mac
+# convierte ese bloqueo en camiones parados sin salida.
 url_publica() {
   local url="$1" host
   [[ "$url" =~ ^https:// ]] || return 1
@@ -127,7 +134,7 @@ else
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
 
-printf '\n\033[1mTimón · release\033[0m  \033[2m(%s · %s · %s)\033[0m\n' "$COMPANY" "$ABI" "$API_URL"
+printf '\n\033[1mTimón · release\033[0m  \033[2m(%s · %s)\033[0m\n' "$ABI" "$API_URL"
 printf '─────────────────────────────────────────────\n'
 printf '\033[2mJDK %s · %s\033[0m\n' "$(version_jdk "$JAVA_HOME")" "$JAVA_HOME"
 
@@ -181,6 +188,9 @@ paso 3 "Compilando"
 printf '\033[2m… prebuild + gradle con R8, tarda ~3 min\033[0m\n'
 LOG=$(mktemp)
 export EXPO_PUBLIC_API_URL="$API_URL"
+# La tienda se fija igual que el Portal: si se hereda, un `.env` de desarrollo
+# manda el release a preguntar la versión mínima a una LilaStore local.
+export EXPO_PUBLIC_STORE_URL="$STORE_URL"
 if ! ( npx expo prebuild --platform android >"$LOG" 2>&1 \
     && ./android/gradlew -p android assembleRelease -PreactNativeArchitectures="$ABI" >>"$LOG" 2>&1 ); then
   printf '\033[31m✗ falló la compilación\033[0m\n'
@@ -217,6 +227,12 @@ if [ -f "$BUNDLE" ]; then
   grep -aq "$API_URL" "$BUNDLE" \
     && printf '  \033[32m✓\033[0m apunta a %s\n' "$API_URL" \
     || aviso "no se encontró $API_URL dentro del bundle: revisalo antes de repartir"
+  # La tienda también se verifica DENTRO del binario: es de donde el chofer va a
+  # bajar la próxima versión, y una URL de desarrollo acá se ve exactamente
+  # igual que una buena hasta el día que hay que actualizar a toda la flota.
+  grep -aq "$STORE_URL" "$BUNDLE" \
+    && printf '  \033[32m✓\033[0m la tienda es %s\n' "$STORE_URL" \
+    || aviso "no se encontró $STORE_URL dentro del bundle: revisalo antes de repartir"
 fi
 rm -rf "$TMPB"
 if echo "$FIRMANTE" | grep -qi "Android Debug"; then
@@ -224,40 +240,50 @@ if echo "$FIRMANTE" | grep -qi "Android Debug"; then
   aviso "firma de DEBUG: se instala encima de la actual. Al pasar a la keystore propia habrá que desinstalar en cada teléfono."
 fi
 
-# ── 5. Publicar en el Drive ────────────────────────────────────────────────
+# ── 5. Publicar en LilaStore ───────────────────────────────────────────────
 paso 5 "Publicando"
 if [ "$PUBLICAR" = "0" ]; then
   printf '\033[2m— omitido (--solo-compilar)\033[0m\n'
   URL=""
 else
-  export NEXT_PUBLIC_LILA_SERVER_URL="$LILA_URL"
-  SALIDA=$( cd /Users/josezamora/projects/Portal \
-    && npx tsx --env-file=.env scripts/publish-timon-apk.ts \
-         "/Users/josezamora/projects/timon/$DESTINO" "$COMPANY" "$CARPETA" 2>/dev/null | tail -1 )
-  URL=$(node -p "JSON.parse(process.argv[1]).downloadUrl" "$SALIDA" 2>/dev/null || echo '')
-  [ -z "$URL" ] && { printf '\033[31m✗ no se pudo publicar\033[0m\n%s\n' "$SALIDA"; exit 1; }
-  # Antes del paso 6: si la URL no sirve, se corta acá y NADIE queda bloqueado.
-  if ! url_publica "$URL"; then
-    printf '\033[31m✗ la URL publicada no le sirve a un teléfono:\033[0m %s\n' "$URL"
-    printf '  Revisá LILA_URL (--lila=%s).\n' "$LILA_URL"
-    printf '  No se fijó la versión mínima: la flota sigue trabajando con la anterior.\n'
+  # Antes de subir nada: una tienda que el teléfono del chofer no resuelve
+  # convierte el bloqueo del paso siguiente en camiones parados sin salida.
+  if ! url_publica "$STORE_URL"; then
+    printf '\033[31m✗ la tienda no le sirve a un teléfono:\033[0m %s\n' "$STORE_URL"
+    printf '  Revisalo con --tienda=https://…\n'
     exit 1
   fi
-  ok "Drive › $CARPETA"
-fi
 
-# ── 6. Marcarla como obligatoria ───────────────────────────────────────────
-paso 6 "Versión mínima"
-if [ "$PUBLICAR" = "0" ] || [ "$OBLIGAR" = "0" ]; then
-  printf '\033[2m— omitido\033[0m\n'
-else
-  ( cd /Users/josezamora/projects/Portal \
-    && npx tsx --env-file=.env scripts/set-timon-min-version.ts "$VERSION" >/dev/null 2>&1 ) \
-    && ok "$VERSION · los teléfonos con menos verán «actualizá»" \
-    || aviso "no se pudo fijar la mínima: la app no va a avisar de esta versión"
+  # `--obligar` publica Y fija la versión mínima en un solo acto, con el mismo
+  # token y contra el mismo server que guarda el binario. Antes eran dos pasos
+  # —subir al Drive, después escribir la mínima en Portal— y el hueco entre
+  # ellos dejaba el APK nuevo arriba con el mínimo apuntando a la anterior.
+  # El CLI escribe varias líneas; sin este salto quedan pegadas al «5/5».
+  printf '\n'
+  ARGS=(--channel=stable "--url=$STORE_URL")
+  [ "$OBLIGAR" = "1" ] && ARGS+=(--obligar)
+
+  # Sin `| tail -1` ni `2>/dev/null`: lo que dice el CLI cuando algo sale mal
+  # —el 409 del versionCode repetido, el token vencido, la firma que no coincide—
+  # es justo lo que hay que leer. Tragárselo fue cómo una publicación silenciosa
+  # pasó por buena durante una tarde entera.
+  if ! node /Users/josezamora/projects/lila-cli/bin/lila.mjs apk publish "$DESTINO" "${ARGS[@]}"; then
+    printf '\033[31m✗ no se pudo publicar\033[0m\n'
+    exit 1
+  fi
+  URL="$STORE_URL/get"
+  printf '                '
+  ok "LilaStore"
 fi
 
 printf '─────────────────────────────────────────────\n'
 printf '\033[1mListo.\033[0m Timón %s (build %s) · %s\n' "$VERSION" "$CODE" "$(mb "$PESO")"
-[ -n "$URL" ] && printf 'La app ya ofrece esta versión al abrirse.\n%s\n' "$URL"
+if [ -n "$URL" ]; then
+  if [ "$OBLIGAR" = "1" ]; then
+    printf 'Los teléfonos con una versión anterior verán «actualizá» al abrir.\n'
+  else
+    printf 'Publicada sin obligar: nadie va a ver el aviso de actualizar.\n'
+  fi
+  printf '%s\n' "$URL"
+fi
 printf '\n'
