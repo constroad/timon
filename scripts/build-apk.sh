@@ -32,7 +32,7 @@ cd "$(dirname "$0")/.."
 
 # **La versión va FIJA.** Un release tiene que poder repetirse dentro de un año
 # y dar el mismo resultado.
-CLI_VERSION=0.5.2
+CLI_VERSION=0.6.0
 CLI=(npx --yes "@constroad/lila-cli@$CLI_VERSION")
 if [[ "${CLI_LOCAL:-0}" == "1" ]]; then
   echo "⚠ CLI_LOCAL=1 — usando el repo local, NO @$CLI_VERSION"
