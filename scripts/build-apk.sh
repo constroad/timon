@@ -57,6 +57,9 @@ API_URL=https://www.constroad.com
 # release termina apuntando al emulador y falla en la mano del chofer con el wifi
 # perfecto.
 STORE_URL=https://lilastore.constroad.com
+# La versión del CLI va fija, igual que la URL: un release tiene que poder
+# repetirse dentro de un año y dar el mismo resultado.
+CLI_VERSION=0.5.0
 # Fijar la versión mínima al publicar es lo que hace que la app AVISE al chofer
 # que tiene que actualizar: es el único mecanismo que hay (no existe un «hay una
 # nueva» opcional). Deja fuera a los teléfonos por debajo, pero la pantalla de
@@ -261,13 +264,15 @@ else
   # El CLI escribe varias líneas; sin este salto quedan pegadas al «5/5».
   printf '\n'
   ARGS=(--channel=stable "--url=$STORE_URL")
-  [ "$OBLIGAR" = "1" ] && ARGS+=(--obligar)
+  [ "$OBLIGAR" = "1" ] && ARGS+=(--enforce)
 
   # Sin `| tail -1` ni `2>/dev/null`: lo que dice el CLI cuando algo sale mal
   # —el 409 del versionCode repetido, el token vencido, la firma que no coincide—
   # es justo lo que hay que leer. Tragárselo fue cómo una publicación silenciosa
   # pasó por buena durante una tarde entera.
-  if ! node /Users/josezamora/projects/lila-cli/bin/lila.mjs apk publish "$DESTINO" "${ARGS[@]}"; then
+  # El CLI PUBLICADO y con la versión fija, no la copia del repo local: es el
+  # mismo que corre el runner de Actions, y esa es toda la gracia.
+  if ! npx --yes "@constroad/lila-cli@$CLI_VERSION" apk publish "$DESTINO" "${ARGS[@]}"; then
     printf '\033[31m✗ no se pudo publicar\033[0m\n'
     exit 1
   fi

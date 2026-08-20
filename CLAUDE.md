@@ -37,7 +37,7 @@ escribía en `systemSettings` con otro. Dos caminos con dos formas de fallar por
 separado, y el hueco entre ellos —APK nuevo arriba, mínimo apuntando a la
 anterior— dejaba a los choferes sin enterarse. Hoy:
 
-- `npm run release` publica con `lila apk publish --obligar`: subir y fijar la
+- `npm run release` publica con `lila apk publish --enforce`: subir y fijar la
   mínima son **un solo acto**, con el mismo token y contra el mismo server que
   guarda el binario.
 - `fetchMinVersion()` pregunta a `GET /api/v1/apps/timon/min-version` de
