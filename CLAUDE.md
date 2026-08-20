@@ -37,14 +37,21 @@ escribía en `systemSettings` con otro. Dos caminos con dos formas de fallar por
 separado, y el hueco entre ellos —APK nuevo arriba, mínimo apuntando a la
 anterior— dejaba a los choferes sin enterarse. Hoy:
 
-- `npm run release` publica con `lila apk publish --enforce`: subir y fijar la
-  mínima son **un solo acto**, con el mismo token y contra el mismo server que
-  guarda el binario.
+- `npm run release` es un **envoltorio del CLI**: `lila apk build` +
+  `lila apk publish --enforce`. Pasó de 294 líneas a 108 el 20/08/2026 — todo lo
+  que duplicaba (JDK 17, Gradle, verificar la firma real, buscar las URLs en el
+  bundle) vive en el CLI y se arregla en un solo lugar. Acá queda lo de este
+  repo: `--bump`, el canal, y si se obliga.
+- Subir y fijar la mínima son **un solo acto**, con el mismo token y contra el
+  mismo server que guarda el binario.
 - `fetchMinVersion()` pregunta a `GET /api/v1/apps/timon/min-version` de
   LilaStore. `/api/public/app/version` de Portal quedó **solo para los APK ya
   instalados** que todavía apuntan ahí, y ya no se actualiza.
-- La URL de la tienda se **fija** en `client.ts` y en `lila.json`, nunca se
-  hereda del entorno — el mismo motivo que `EXPO_PUBLIC_API_URL`.
+- Las dos URLs se **declaran** en `lila.json` (`EXPO_PUBLIC_API_URL` y
+  `EXPO_PUBLIC_STORE_URL`), nunca se heredan del entorno. El CLI comprueba
+  **las dos** —hasta el 20/08 miraba solo la primera— y que le sirvan a un
+  teléfono ajeno: la Tailnet es la trampa, porque el build sale verde y el APK
+  no funciona en la mano de otro.
 - **`downloadUrl` viene vacía mientras Timón esté marcada privada** en LilaStore:
   `/d/:releaseId` solo sirve sin credencial a las apps públicas. Con la URL vacía
   la pantalla de bloqueo avisa igual, pero pierde el botón que baja el APK ahí
