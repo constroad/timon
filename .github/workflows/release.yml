@@ -80,7 +80,7 @@ jobs:
       # un APK compilado con el .env de desarrollo se instala perfecto y falla en
       # la mano del chofer con «sin conexión» y el wifi funcionando.
       - name: Compilar y firmar
-        run: npx @constroad/lila-cli@0.5.0 apk build
+        run: npx @constroad/lila-cli@0.5.1 apk build
 
       # El artefacto ANTES de publicar: si la subida falla —y no hay reintento ni
       # reanudación— se republica sin volver a compilar quince minutos.
@@ -105,7 +105,7 @@ jobs:
           set -euo pipefail
           [ -n "${LILASTORE_TOKEN:-}" ] || { echo "::error::Falta el secret LILASTORE_TOKEN"; exit 1; }
           echo "Publicando en $CANAL"
-          npx @constroad/lila-cli@0.5.0 apk publish --channel="$CANAL"
+          npx @constroad/lila-cli@0.5.1 apk publish --channel="$CANAL"
 
       # `if: always()`: si algo falló a mitad, la keystore no puede quedar en el
       # disco del runner. El runner es efímero, pero no hace falta confiar en eso

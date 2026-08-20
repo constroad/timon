@@ -59,7 +59,7 @@ API_URL=https://www.constroad.com
 STORE_URL=https://lilastore.constroad.com
 # La versión del CLI va fija, igual que la URL: un release tiene que poder
 # repetirse dentro de un año y dar el mismo resultado.
-CLI_VERSION=0.5.0
+CLI_VERSION=0.5.1
 # Fijar la versión mínima al publicar es lo que hace que la app AVISE al chofer
 # que tiene que actualizar: es el único mecanismo que hay (no existe un «hay una
 # nueva» opcional). Deja fuera a los teléfonos por debajo, pero la pantalla de
