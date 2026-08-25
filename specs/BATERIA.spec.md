@@ -1,6 +1,14 @@
 # Consumo de batería del rastreo — diagnóstico y plan
 
-> **Estado: reportado, sin medir.** Un chofer reportó consumo excesivo
+> **Estado: dos defectos arreglados, el resto sin medir.** Los §1.1 y el
+> `deferredUpdatesInterval` del §1.2 están corregidos (ver §3). Lo que toca la
+> precisión del GPS sigue esperando una medición real.
+>
+> **Falta lo más importante: comprobar que esto sirvió.** Hasta que no haya un
+> `batterystats` de un viaje real con el APK nuevo, lo único que sabemos es que
+> el código hace lo que decía hacer — no que el chofer note la diferencia.
+>
+> **Reportado, sin medir.** Un chofer reportó consumo excesivo
 > (20/08/2026). Este documento separa lo que ya se puede afirmar leyendo el
 > código de lo que hace falta medir, porque diagnosticar batería a ojo es como
 > diagnosticar performance a ojo: se termina optimizando lo que no era.
@@ -116,15 +124,22 @@ flota, o al menos en el mismo modelo.
 
 ## 3. Plan de arreglo, en orden
 
-Los dos primeros no dependen de la medición: son defectos demostrables.
+Los dos primeros no dependían de la medición: eran defectos demostrables. **Los
+dos están hechos** (20/08/2026).
 
-1. **Calcular `stoppedMinutes` de verdad** y **reevaluar el muestreo mientras el
-   viaje corre**, no solo al arrancar. Es lo que hace que las tres ramas de la
-   política existan de verdad. Implica reiniciar las actualizaciones con los
-   valores nuevos cuando la rama cambia — cambio de estado real, no un
-   parámetro que se ajusta en caliente.
-2. **Subir `deferredUpdatesInterval`** muy por encima del intervalo de muestreo,
-   para que el sistema pueda agrupar y dormir entre ráfagas.
+1. ~~**Calcular `stoppedMinutes` de verdad** y **reevaluar el muestreo mientras
+   el viaje corre**.~~ **Hecho.** `minutosDetenido` (motor puro, con test) mide
+   contra el punto más reciente y tolera 60 m de deriva del GPS — sin esa
+   tolerancia un camión parado «se mueve» en cada lectura y la rama no se activa
+   nunca. La reevaluación vive **dentro de la tarea de background**, no en un
+   `useEffect`: la tarea corre con el proceso de la UI muerto, que es
+   exactamente el caso que importa (camión parado, pantalla apagada). Solo
+   rearma el servicio cuando el muestreo cambia de rama (`cambioDeRama`), porque
+   reiniciar en cada fix costaría más de lo que ahorra. Y **nunca tumba el
+   rastreo**: si la reevaluación falla, sigue corriendo el muestreo anterior.
+2. ~~**Subir `deferredUpdatesInterval`.**~~ **Hecho**: pasa a ×4 el intervalo,
+   para que el sistema pueda juntar cuatro fixes y despertar una vez. Igualado
+   al intervalo no agrupaba nada.
 3. **Revisar `pausesUpdatesAutomatically`** con datos: si el sistema pausa en una
    parada larga, es exactamente lo que queremos. El motivo por el que está en
    `false` no está escrito; hay que recuperarlo antes de cambiarlo.

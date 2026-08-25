@@ -3,7 +3,7 @@ import * as Battery from 'expo-battery';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { addPoint, type BufferedPoint } from './buffer';
-import { resolveSampling, type SamplingConfig } from './policy';
+import { cambioDeRama, minutosDetenido, resolveSampling, type Sampling, type SamplingConfig } from './policy';
 import { type PermissionState, type TrackingPlatform } from './permission';
 import { readBufferFromDisk, writeBufferToDisk } from './store';
 
@@ -25,6 +25,16 @@ import { readBufferFromDisk, writeBufferToDisk } from './store';
  */
 
 export const LOCATION_TASK = 'timon-rastro-viaje';
+
+/**
+ * El muestreo con el que está corriendo el servicio, y la config que lo generó.
+ *
+ * **Viven en memoria del proceso a propósito.** Si el proceso muere, `isTracking`
+ * dice que no hay rastreo y el hook lo relevanta desde cero — que recalcula todo.
+ * Persistirlos a disco sería guardar un estado que ya se puede derivar.
+ */
+let muestreoActivo: Sampling | null = null;
+let configActiva: SamplingConfig | null = null;
 
 /**
  * La notificación NO es decorativa: sin ella Android mata el servicio a los
@@ -51,6 +61,12 @@ TaskManager.defineTask(LOCATION_TASK, async ({ data, error }) => {
     buffer = addPoint(buffer, toBufferedPoint(fix));
   }
   writeBufferToDisk(buffer);
+
+  // **La reevaluación vive ACÁ y no en la interfaz.** Esta tarea corre con el
+  // proceso de la UI muerto, que es exactamente cuando importa bajar el
+  // muestreo: un camión parado tres horas con la pantalla apagada. En un
+  // `useEffect` no correría justo en ese caso.
+  await reevaluarMuestreo(buffer);
 });
 
 /**
@@ -149,6 +165,9 @@ export async function startTracking(config?: SamplingConfig): Promise<boolean> {
 
   const bateria = await batteryLevelSafe();
   const { intervalMs, distanceM } = resolveSampling({
+    // Cero es CORRECTO acá: el viaje acaba de arrancar, el camión no lleva
+    // media hora quieto. Lo que estaba mal era que se quedara en cero para
+    // siempre — de eso se ocupa `reevaluarMuestreo` en cada entrega de fixes.
     stoppedMinutes: 0,
     batteryLevel: bateria,
     config,
@@ -157,20 +176,9 @@ export async function startTracking(config?: SamplingConfig): Promise<boolean> {
   // iOS sin «Siempre» rechaza el arranque en segundo plano. No puede tumbar la
   // pantalla: se reporta que no arrancó y el aviso de permisos explica por qué.
   try {
-    await Location.startLocationUpdatesAsync(LOCATION_TASK, {
-      // `High` se alimenta del GPS. `Balanced` usa wifi y antenas de celular, que
-      // en la carretera no existen: ahí su «precisión» son kilómetros. Para un
-      // camión entre ciudades el GPS no es un lujo, es la única fuente real.
-      accuracy: Location.Accuracy.High,
-      timeInterval: intervalMs,
-      distanceInterval: distanceM,
-      // Doze agrupa despertares (§4.4-2): esto pide que los entregue igual, aun
-      // en ráfagas, en vez de perderlos.
-      deferredUpdatesInterval: intervalMs,
-      pausesUpdatesAutomatically: false,
-      showsBackgroundLocationIndicator: true,
-      foregroundService: FOREGROUND_SERVICE,
-    });
+    await Location.startLocationUpdatesAsync(LOCATION_TASK, opcionesDeRastreo({ intervalMs, distanceM }));
+    muestreoActivo = { intervalMs, distanceM };
+    configActiva = config ?? null;
   } catch {
     return false;
   }
@@ -178,8 +186,67 @@ export async function startTracking(config?: SamplingConfig): Promise<boolean> {
 }
 
 export async function stopTracking(): Promise<void> {
+  muestreoActivo = null;
   if (!(await isTracking())) return;
   await Location.stopLocationUpdatesAsync(LOCATION_TASK);
+}
+
+/**
+ * Las opciones con las que se arranca —y se rearranca— el servicio.
+ *
+ * Están en una función porque `reevaluarMuestreo` tiene que rearmar el servicio
+ * con exactamente las mismas salvo el intervalo: dos listas separadas se
+ * desincronizan en el primer cambio, y el síntoma sería un rastreo que se
+ * comporta distinto después de la primera parada.
+ */
+function opcionesDeRastreo({ intervalMs, distanceM }: Sampling): Location.LocationTaskOptions {
+  return {
+    // `High` se alimenta del GPS. `Balanced` usa wifi y antenas de celular, que
+    // en la carretera no existen: ahí su «precisión» son kilómetros. Para un
+    // camión entre ciudades el GPS no es un lujo, es la única fuente real.
+    accuracy: Location.Accuracy.High,
+    timeInterval: intervalMs,
+    distanceInterval: distanceM,
+    // **Cuatro veces el intervalo, no igual.** El «deferred» existe para AGRUPAR
+    // entregas y dejar dormir la radio entre ráfagas; igualado al intervalo no
+    // agrupa nada y es equivalente a no usarlo (`specs/BATERIA.spec.md` §1.2).
+    // Con ×4 el sistema puede juntar cuatro fixes y despertar una vez.
+    deferredUpdatesInterval: intervalMs * 4,
+    pausesUpdatesAutomatically: false,
+    showsBackgroundLocationIndicator: true,
+    foregroundService: FOREGROUND_SERVICE,
+  };
+}
+
+/**
+ * Recalcula el muestreo con lo que se sabe AHORA y reinicia si cambió de rama.
+ *
+ * Antes esto no existía: `resolveSampling` se llamaba una sola vez al arrancar
+ * el viaje, con `stoppedMinutes: 0` fijo. Resultado — la rama «detenido» era
+ * código muerto y la de batería baja solo aplicaba a viajes que ya empezaban con
+ * el teléfono descargado, o sea cuando menos servía (`specs/BATERIA.spec.md`).
+ *
+ * **Nunca tumba el rastreo.** Si algo falla acá, lo que había sigue corriendo:
+ * un rastro con el muestreo viejo es infinitamente mejor que ninguno.
+ */
+async function reevaluarMuestreo(buffer: BufferedPoint[]): Promise<void> {
+  try {
+    if (!muestreoActivo) return;
+
+    const nuevo = resolveSampling({
+      stoppedMinutes: minutosDetenido(buffer, Date.now()),
+      batteryLevel: await batteryLevelSafe(),
+      config: configActiva ?? undefined,
+    });
+    if (!cambioDeRama(muestreoActivo, nuevo)) return;
+
+    // Cambiar el intervalo no es ajustar un parámetro: hay que rearmar el
+    // servicio. Se pisa la config anterior con la misma tarea.
+    await Location.startLocationUpdatesAsync(LOCATION_TASK, opcionesDeRastreo(nuevo));
+    muestreoActivo = nuevo;
+  } catch {
+    // El muestreo viejo sigue vigente. No se toca `muestreoActivo`.
+  }
 }
 
 export async function isTracking(): Promise<boolean> {
