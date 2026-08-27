@@ -9,6 +9,7 @@ import { AttendanceScreen } from './src/attendance/AttendanceScreen';
 import { AppHeader } from './src/ui/AppHeader';
 import { AppMenuSheet } from './src/ui/AppMenuSheet';
 import { applyAccent, theme } from './src/ui/theme';
+import { ErrorBoundary } from './src/ui/ErrorBoundary';
 import { resolveVersionGate, type VersionGate } from './src/version/gate';
 import { useVersionGate } from './src/version/useVersionGate';
 import { UpdateRequiredScreen } from './src/version/UpdateRequiredScreen';
@@ -38,7 +39,26 @@ type Boot =
     }
   | { phase: 'actualizar'; gate: VersionGate };
 
+/**
+ * La raíz solo pone la red de seguridad (27/08/2026).
+ *
+ * `Contenido` tiene cinco `return` distintos —cargando, bloqueado, actualizar,
+ * alta y adentro—, así que envolver la app entera acá es lo único que cubre los
+ * cinco. Envolver cada uno dejaría el hueco justo en el que se olvide.
+ *
+ * Antes de esto, un error de render dejaba al chofer con la pantalla en blanco y
+ * a nosotros sin una sola línea. Es peor que en las otras apps: quien lo sufre
+ * está manejando y no va a ponerse a reportarlo.
+ */
 export default function App() {
+  return (
+    <ErrorBoundary pantalla="app">
+      <Contenido />
+    </ErrorBoundary>
+  );
+}
+
+function Contenido() {
   const [boot, setBoot] = useState<Boot>({ phase: 'cargando' });
   /** Los dos menús del pedido. Arranca en viajes: es lo que se mira todo el día. */
   const [menu, setMenu] = useState<'viajes' | 'asistencia'>('viajes');
