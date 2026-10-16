@@ -24,6 +24,8 @@ export type AppMenuSheetProps = {
   onLogout: () => void;
   /** Abre la pantalla de actualización con lo que diga el server. */
   onCheckUpdates: () => void;
+  /** Abre el diagnóstico local (errores y tiempos de este teléfono). */
+  onDiagnostico: () => void;
 };
 
 const SERVER_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://www.constroad.com';
@@ -38,6 +40,7 @@ export const AppMenuSheet = ({
   onGoAttendance,
   onLogout,
   onCheckUpdates,
+  onDiagnostico,
 }: AppMenuSheetProps) => {
   const [acercaDe, setAcercaDe] = useState(false);
   const [update, setUpdate] = useState<UpdateState | null>(null);
@@ -104,6 +107,7 @@ export const AppMenuSheet = ({
                 }}
                 testID="menu-acerca-de"
               />
+              <Opcion label="Diagnóstico" onPress={() => ir(onDiagnostico)} testID="menu-diagnostico" />
               {/* Destructivo y al final, separado: desvincular obliga a hacer el
                   alta de nuevo (código de empresa + WhatsApp). */}
               <Opcion label="Cerrar sesión" onPress={() => ir(onLogout)} destructivo testID="menu-salir" />

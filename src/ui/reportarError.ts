@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import appConfig from '../../app.json';
 import { armarReporte } from './reporteDeError';
+import { registrarError } from '../diagnostico/registro';
 
 /**
  * Contarle a alguien que la app se rompió.
@@ -36,6 +37,11 @@ const TIMEOUT_MS = 5_000;
  * vacío justo cuando la red está mala — que es cuando más se rompe.
  */
 export function reportarError(pantalla: string, error: unknown): void {
+  // También al diagnóstico local: así un fallo de render —el que ve el chofer—
+  // viaja a LilaStore cuando toca «Enviar problema», no solo al aviso inmediato
+  // de /api/crash. No lanza (registrarError se traga sus propios errores).
+  registrarError(error, `pantalla:${pantalla}`);
+
   const reporte = armarReporte({
     app: 'timon',
     version: appConfig.expo.version,

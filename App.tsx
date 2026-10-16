@@ -8,6 +8,8 @@ import { TripsScreen } from './src/trips/TripsScreen';
 import { AttendanceScreen } from './src/attendance/AttendanceScreen';
 import { AppHeader } from './src/ui/AppHeader';
 import { AppMenuSheet } from './src/ui/AppMenuSheet';
+import { DiagnosticoScreen } from './src/diagnostico/DiagnosticoScreen';
+import { medir } from './src/diagnostico/registro';
 import { applyAccent, theme } from './src/ui/theme';
 import { ErrorBoundary } from './src/ui/ErrorBoundary';
 import { resolveVersionGate, type VersionGate } from './src/version/gate';
@@ -63,6 +65,7 @@ function Contenido() {
   /** Los dos menús del pedido. Arranca en viajes: es lo que se mira todo el día. */
   const [menu, setMenu] = useState<'viajes' | 'asistencia'>('viajes');
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [diagnosticoAbierto, setDiagnosticoAbierto] = useState(false);
   /**
    * «Ahora no» de la pantalla de actualización. Vive en MEMORIA a propósito:
    * al volver a abrir la app la compuerta pregunta de nuevo. Saltar es por
@@ -100,7 +103,9 @@ function Contenido() {
       return;
     }
     try {
-      const session = await checkSession(credential);
+      // Se cronometra: cuánto tarda verificar la sesión en este teléfono y red
+      // es justo lo que no se puede mirar de otra forma (queda en el diagnóstico).
+      const session = await medir('check-session', () => checkSession(credential));
       applyAccent(session.company.accentColor);
       setBoot({
         phase: 'adentro',
@@ -204,7 +209,9 @@ function Contenido() {
           saltoActualizacionRef.current = false;
           void resume();
         }}
+        onDiagnostico={() => setDiagnosticoAbierto(true)}
       />
+      <DiagnosticoScreen visible={diagnosticoAbierto} onClose={() => setDiagnosticoAbierto(false)} />
       <View style={styles.fill}>
         {menu === 'asistencia' && boot.attendance ? (
           <AttendanceScreen credential={boot.credential} />
